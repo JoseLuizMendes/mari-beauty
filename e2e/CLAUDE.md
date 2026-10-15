@@ -140,6 +140,21 @@ Nenhum tinha bug de produto. As causas, para não se repetirem:
    O lado de produção — 1,5 MB de PNG servido na vitrine — é problema
    separado, tratado na geração de AVIF/WebP.
 
+9. **O rate limit agora sobrevive ao fim da suíte.** O contador mora no
+   Postgres (`rate_limit_windows`), não mais num `Map` que morria junto
+   com o servidor. Consequência prática: rodar a suíte duas vezes dentro
+   da janela estourava limites legítimos — `contact` permite 5 envios por
+   10 minutos e, com `retries: 2`, uma execução já pode gastar 3.
+
+   Por isso `playwright.config.ts` dá a cada execução um
+   `x-forwarded-for` próprio (faixa TEST-NET-2), e
+   `e2e/rate-limit.spec.ts` usa um IP só dele (TEST-NET-3) — a rajada
+   dele consumiria a cota de cupom do `checkout-flow`, que valida
+   `BELES10` no meio do fluxo.
+
+   Spec novo que bate em rota com limite: ou cabe na cota da execução, ou
+   usa IP próprio. Nunca conte com o contador estar zerado.
+
 > **Regra:** `test.skip` sem condição só com link de issue e prazo. "A
 > debugar" não é prazo — foi essa nota que manteve três fluxos de receita
 > desligados com o CI verde por omissão.

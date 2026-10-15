@@ -139,6 +139,13 @@ vi.mock("@/lib/shared/infrastructure/prisma-client", () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    rateLimitWindow: {
+      deleteMany: vi.fn(),
+    },
+    // Usado pelo contador de rate limit, que precisa de um único
+    // `INSERT ... ON CONFLICT` para ser atômico — ver
+    // `rate-limit-store-postgres.ts`.
+    $queryRaw: vi.fn(),
     $transaction: vi.fn(async (arg: unknown) => {
       // Suporta tanto array de promises quanto callback(tx)
       if (Array.isArray(arg)) return Promise.all(arg);
@@ -247,4 +254,13 @@ beforeEach(async () => {
   const { resetDefaultStore } =
     await import("@/lib/shared/infrastructure/rate-limit");
   resetDefaultStore();
+
+  // São dois contadores distintos, e quem atende os handlers é o segundo:
+  // `with-rate-limit.ts` usa o store de Postgres, cujo contador de
+  // degradação (em memória) entra em cena justamente aqui, porque o Prisma
+  // está mockado e o upsert não resolve. Zerar só o primeiro deixava o
+  // resíduo passar e devolvia 429 nos casos finais.
+  const { resetRateLimitStore } =
+    await import("@/lib/shared/infrastructure/with-rate-limit");
+  resetRateLimitStore();
 });

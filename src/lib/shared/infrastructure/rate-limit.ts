@@ -8,19 +8,21 @@
  * Canon do vault (`Backend Onboarding Protocol` §Segurança): "Rate limiting
  * em rotas públicas e de auth".
  *
- * ── ⚠️ LIMITAÇÃO IMPORTANTE ───────────────────────────────────────────
+ * ── Onde o contador mora ──────────────────────────────────────────────
  *
- * O store padrão é EM MEMÓRIA. Em serverless (Vercel), cada instância tem
- * seu próprio `Map`: quem ataca com concorrência cai em instâncias
- * diferentes e contorna o limite. Isto **reduz** flood acidental e script
- * ingênuo; **não** detém atacante determinado.
+ * Este arquivo tem o **motor e as regras**, e nenhuma dependência de
+ * banco — é o que o mantém testável em unit, rápido, sem subir nada.
  *
- * O caminho certo é o mesmo que `admin-login.ts` já usa: contador no
- * Postgres, que é a memória que todas as instâncias compartilham. Por isso
- * o store é uma interface — trocar é adicionar um arquivo que implemente
- * `RateLimitStore`, não reescrever os call sites.
+ * O contador de verdade vive no Postgres
+ * (`rate-limit-store-postgres.ts`), porque em serverless cada instância
+ * tem seu próprio `Map`: quem ataca com concorrência cai em instâncias
+ * diferentes e passa por baixo de um limite em memória. A escolha do
+ * store é feita em `with-rate-limit.ts`, que é a raiz de composição.
  *
- * Ver "Rate limit distribuído" em docs/AUDITORIA-2026-10.md.
+ * `InMemoryRateLimitStore`, abaixo, continua existindo com dois papéis:
+ * é o store dos testes de unidade, e é para onde o store de Postgres
+ * degrada se o banco não responder — degradar para o comportamento
+ * antigo é melhor que abrir a rota ou derrubá-la.
  */
 
 export interface RateLimitRule {
@@ -77,11 +79,16 @@ export class InMemoryRateLimitStore implements RateLimitStore {
       if (this.windows.size >= this.maxKeys) this.evictExpired(windowMs, now);
       const fresh = { count: 1, windowStart: now };
       this.windows.set(key, fresh);
-      return fresh;
+      // Cópia, não a linha guardada: devolver a referência interna fazia
+      // o resultado de uma chamada mudar sozinho quando a próxima
+      // incrementava o mesmo contador. Quem chama hoje consome o valor na
+      // hora e não notava, mas é uma armadilha esperando quem guardar o
+      // retorno — e a assinatura promete um instantâneo.
+      return { ...fresh };
     }
 
     existing.count += 1;
-    return existing;
+    return { count: existing.count, windowStart: existing.windowStart };
   }
 
   private evictExpired(windowMs: number, now: number) {

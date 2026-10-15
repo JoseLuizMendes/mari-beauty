@@ -460,17 +460,33 @@ de design system**.
 Coisas que só apareceram ao mexer no código. Nenhuma estava na auditoria
 original.
 
-### 🟠 Rate limit distribuído — pendente, bloqueia produção
+### ✅ Rate limit distribuído — resolvido
 
-O PR #17 pôs rate limit nas cinco rotas públicas, mas com **store em
-memória**. Em serverless cada instância tem o próprio `Map`, então ataque
-com concorrência contorna. Reduz flood acidental; não detém atacante.
+O PR #17 pôs rate limit nas cinco rotas públicas, mas com store **em
+memória**: em serverless cada instância tem o próprio `Map`, então ataque
+com concorrência contornava. Reduzia flood acidental; não detinha
+atacante.
 
-O certo é contador no Postgres, como `admin-login.ts` já faz com
-`AdminLoginAttempt`. Exige migration — não feita porque o Docker não estava
-disponível para gerar e testar, e migration não testada é pior que o
-problema. O store é uma interface (`RateLimitStore`), então é adicionar um
-arquivo, não reescrever call sites.
+O contador passou para o Postgres (`rate_limit_windows`), como
+`admin-login.ts` já fazia com `AdminLoginAttempt`. Três decisões valem
+registro:
+
+- **Um único `INSERT ... ON CONFLICT DO UPDATE`.** Ler a linha, decidir em
+  TypeScript e gravar de volta reintroduz exatamente a corrida que se veio
+  eliminar — duas instâncias leem 9, as duas gravam 10, e passaram 11. É o
+  motivo de `$queryRaw` aqui, contra a regra geral do `src/lib/CLAUDE.md`.
+- **Banco fora do ar degrada, não abre.** Cai para o contador em memória,
+  que é o comportamento que o projeto tinha até aqui. Falhar aberto
+  reabriria `/api/coupon/validate` para enumeração; falhar fechado
+  derrubaria contato e CEP para cliente legítimo por causa de um blip.
+- **A prova é concorrente.** `e2e/rate-limit.spec.ts` dispara 15 pedidos
+  simultâneos contra banco real e exige que **exatamente** 10 passem. Um
+  contador com corrida passa em teste sequencial e falha nesse.
+
+Efeito colateral que valia documentar: o contador agora sobrevive ao fim
+da suíte E2E, então `playwright.config.ts` dá a cada execução um
+`x-forwarded-for` próprio — sem isso, rodar a suíte duas vezes em dez
+minutos estoura o limite de `contact`.
 
 ### 🟠 `pnpm build` exige banco acessível
 

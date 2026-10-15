@@ -49,6 +49,16 @@ Ler `process.env` é acoplamento ao mundo externo — exatamente o que `domain/`
 
 - `prisma-client.ts` — singleton com adapter + pool SSL.
 - `env.ts` — schema Zod do ambiente, parse memoizado e grupos de feature.
+- `rate-limit.ts` — motor e regras. **Sem dependência de banco**, de
+  propósito: é o que o mantém testável em unit sem subir nada.
+- `rate-limit-store-postgres.ts` — o contador de verdade, compartilhado
+  entre instâncias via tabela `rate_limit_windows`. Usa `$queryRaw` porque
+  precisa de um único `INSERT ... ON CONFLICT`: ler, decidir e gravar em
+  passos separados reintroduz a corrida que motivou a mudança. Degrada
+  para o contador em memória se o banco não responder.
+- `with-rate-limit.ts` — `enforceRateLimit` para Route Handlers, e a
+  **raiz de composição**: é o único destes que importa Prisma, e é onde
+  se escolhe o store.
 
 ## Referências
 

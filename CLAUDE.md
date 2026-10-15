@@ -133,9 +133,12 @@ O schema tem dois níveis:
     `enforceRateLimit(req, "<regra>")` na primeira linha do handler.
   - Honeypot: `src/components/ui/honeypot-field.tsx` no form + checagem de
     `HONEYPOT_FIELD_NAME` no handler, respondendo **sucesso falso**.
-  - ⚠️ O store do rate limit é **em memória**: em serverless cada instância
-    tem o seu, então reduz flood mas não detém atacante determinado. O
-    upgrade é um store em Postgres, como `admin-login.ts` já faz.
+  - O contador é **compartilhado via Postgres**
+    (`rate-limit-store-postgres.ts`, tabela `rate_limit_windows`), porque
+    em serverless um `Map` por instância não detém quem ataca com
+    concorrência. O upsert é um único `INSERT ... ON CONFLICT` — ler,
+    decidir e gravar em passos separados reintroduz a corrida. Se o banco
+    não responder, degrada para o contador em memória; não abre a rota.
 
 ### 6.3 Performance
 

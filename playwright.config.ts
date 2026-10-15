@@ -15,6 +15,24 @@ import { defineConfig, devices } from "@playwright/test";
  * Em CI, prefira `pnpm build && pnpm start` para testar o bundle de produção.
  */
 
+/**
+ * IP fictício, um por execução da suíte.
+ * ─────────────────────────────────────────────────────────────────────
+ * O rate limit passou a contar no Postgres, então o contador **sobrevive
+ * ao fim da suíte** — diferente do `Map` em memória, que morria junto com
+ * o servidor. Sem isto, rodar a suíte duas vezes dentro da janela estoura
+ * limites legítimos: `contact` permite 5 envios por 10 minutos e, com
+ * `retries: 2`, uma única execução já pode gastar 3.
+ *
+ * Cada execução ganha seu próprio balde. Faixa TEST-NET-3 (RFC 5737),
+ * reservada para documentação e teste.
+ *
+ * Forjar `x-forwarded-for` só é possível porque o servidor de teste não
+ * está atrás de proxy. Em produção a Vercel sobrescreve o header — é o
+ * que torna `clientKeyFromHeaders` confiável lá.
+ */
+const E2E_CLIENT_IP = `198.51.100.${1 + Math.floor(Math.random() * 250)}`;
+
 const PORT = Number(process.env.E2E_PORT ?? 3000);
 const BASE_URL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
 
@@ -35,6 +53,7 @@ export default defineConfig({
 
   use: {
     baseURL: BASE_URL,
+    extraHTTPHeaders: { "x-forwarded-for": E2E_CLIENT_IP },
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     locale: "pt-BR",
