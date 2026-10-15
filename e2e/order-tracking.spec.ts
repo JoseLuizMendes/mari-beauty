@@ -7,6 +7,7 @@ import {
 } from "./support/db";
 import { loginAsUser, TEST_USER } from "./support/auth";
 import { gotoAndReport } from "./support/navigation";
+import { blockImages } from "./support/network";
 
 /**
  * E2E — Rastreamento de pedido após pagamento aprovado.
@@ -38,8 +39,10 @@ const EMAIL = `e2e-tracking+${Date.now()}@belessence.test`;
 // specs) e sobrevive a retries e a execuções inteiras. Sem este reset, um
 // spec que morre depois de "adicionar à bag" faz o checkout seguinte levar
 // o item órfão junto e derruba a asserção de estoque. Ver `clearCart`.
-test.beforeEach(async () => {
+test.beforeEach(async ({ page }) => {
   await clearCart(TEST_USER.id);
+  // Sem isto o `load` do PDP não dispara no CI — ver `blockImages`.
+  await blockImages(page);
 });
 
 test.afterAll(async () => {

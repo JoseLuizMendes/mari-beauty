@@ -65,14 +65,16 @@ Nenhum tinha bug de produto. As causas, para não se repetirem:
    clique falhava, o teste seguia e morria no `toHaveURL` 15s depois. Passo
    de setup que pode falhar deve falhar alto.
 
-5. **Dado que um spec grava vaza para os outros.** Todos os specs
-   dividem o mesmo banco. O `admin-crud` cria um produto; ele reaparece em
-   "Você Também Vai Amar" das vitrines dos outros specs. Enquanto a imagem
-   desse produto foi `res.cloudinary.com/.../stub.jpg` — que não existe — o
-   `/_next/image` tentava buscá-la no servidor e **todo `page.goto` com
-   `waitUntil: "load"` estourava em 60s**. Duas lições: dublê devolve
-   **asset que existe** (hoje `/assets/hero1.png`), e spec que escreve
-   limpa no `afterAll`.
+5. **Spec que escreve no banco limpa o que escreveu.** Todos os specs
+   dividem o mesmo banco, e o produto que o `admin-crud` cria reaparece em
+   "Você Também Vai Amar" das vitrines dos outros. O dublê de upload
+   devolve um asset que existe de verdade (`/assets/hero1.png`, não uma
+   URL inventada da Cloudinary) e o `afterAll` apaga a linha.
+
+   > Correção de rota: por um tempo esta nota afirmava que a URL morta da
+   > Cloudinary era a causa do travamento de 60s no CI. **Não era** — ver
+   > a armadilha 8, que tem a medida. As duas regras acima continuam
+   > valendo por higiene, mas não eram o bug.
 
 6. **Passar em dev não é passar.** O CI roda `pnpm build && pnpm start`;
    `pnpm dev` serve imagem e rota por caminhos diferentes. Antes de
@@ -103,6 +105,40 @@ Nenhum tinha bug de produto. As causas, para não se repetirem:
    > Como verificar de verdade: rode a suíte **duas vezes seguidas sem
    > limpar o banco entre elas**. Uma execução só, em banco recém-semeado,
    > passa mesmo com o vazamento — foi assim que ele ficou escondido.
+
+8. **`waitUntil: "load"` + imagem real = travamento só no CI.** Esta
+   derrubou `checkout-flow` e `order-tracking` seis vezes seguidas (três
+   tentativas cada) enquanto a suíte inteira passava localmente, duas
+   execuções consecutivas, com `CI=true` e build de produção.
+
+   O `load` só dispara quando **todos** os subrecursos terminam. No PDP as
+   imagens passam pelo otimizador same-origin `/_next/image`, que lê o
+   arquivo e re-encoda. O que o CI instrumentado mediu:
+
+   ```
+   Requisições ainda em voo (1):
+     25.0s  /_next/image?url=%2Fassets%2Fhero1.png&w=640&q=75
+   ```
+
+   `hero1.png` tem 1,5 MB. O mesmo pedido, com cache frio, responde em
+   **0,13s** nesta máquina. Daí a assimetria: num runner de dois núcleos
+   com cache frio o trabalho não cabe no teste, e **rodar a suíte local
+   não prova nada sobre esse travamento**.
+
+   A mensagem nativa do Playwright não ajuda — diz só `waiting until
+"load"`. Por isso existem dois utilitários:
+   - `blockImages` (`support/network.ts`) — aborta requisição de imagem
+     por `resourceType`. **Spec que navega com `load` entra com ele.**
+     Filtrar por host não resolve: a imagem é same-origin.
+   - `gotoAndReport` (`support/navigation.ts`) — se o `load` não vier,
+     falha com a lista do que ficou em voo e há quanto tempo. Foi ele que
+     achou a linha acima, e o erro chega pelas anotações do Actions
+     mesmo quando o artefato do Playwright está fora de alcance.
+
+   Nenhum destes specs verifica imagem, então bloquear não enfraquece
+   asserção nenhuma: DOM, hidratação, Server Action e banco seguem reais.
+   O lado de produção — 1,5 MB de PNG servido na vitrine — é problema
+   separado, tratado na geração de AVIF/WebP.
 
 > **Regra:** `test.skip` sem condição só com link de issue e prazo. "A
 > debugar" não é prazo — foi essa nota que manteve três fluxos de receita

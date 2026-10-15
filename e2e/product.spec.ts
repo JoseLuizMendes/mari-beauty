@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { loginAsUser } from "./support/auth";
+import { blockImages } from "./support/network";
 
 /**
  * E2E — Página de produto (/product/[slug])
@@ -11,17 +12,11 @@ import { loginAsUser } from "./support/auth";
 const SLUG = "midnight-velvet";
 
 test.describe("Produto /product/[slug]", () => {
-  // Aborta TODAS as imagens (qualquer URL) para o evento `load` do page.goto não
-  // ficar refém de rede externa. No CI (next start) as imagens passam pelo
-  // otimizador same-origin `/_next/image` (que busca o Cloudinary NO SERVIDOR e
-  // é lento), então filtrar por host não bastava — filtramos por resourceType.
-  // DOM/hidratação seguem normais; os testes não checam as imagens em si.
+  // Mesmo motivo do checkout-flow e do order-tracking: sem bloquear
+  // imagem, o `load` do PDP não dispara no CI. A explicação inteira
+  // está em `support/network.ts`.
   test.beforeEach(async ({ page }) => {
-    await page.route("**/*", (route) =>
-      route.request().resourceType() === "image"
-        ? route.abort()
-        : route.continue(),
-    );
+    await blockImages(page);
   });
 
   test("renderiza nome, preço e CTA de adicionar", async ({ page }) => {
