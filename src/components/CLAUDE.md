@@ -1,6 +1,7 @@
 # CLAUDE.md — `src/components/`
 
 > Componentes React do domínio Belessence. Subpastas têm regras próprias:
+>
 > - [`ui/`](ui/CLAUDE.md) — primitivos shadcn/Radix (não editar à toa)
 > - [`admin/`](admin/CLAUDE.md) — componentes do painel admin
 > - [`providers/`](providers/CLAUDE.md) — providers globais
@@ -21,24 +22,24 @@
 
 ## 2. Decisão: Server ou Client?
 
-| Precisa de... | Tipo |
-| --- | --- |
-| Renderizar dados, layout, slot | **Server** (default) |
-| `useState`, `useEffect`, hook custom | Client |
-| Animação GSAP, Lenis, Embla | Client |
-| Zustand store (`cart-store`, `wishlist-store`) | Client |
-| `react-hook-form` | Client |
-| `next-themes`, `nuqs` | Client |
+| Precisa de...                                  | Tipo                 |
+| ---------------------------------------------- | -------------------- |
+| Renderizar dados, layout, slot                 | **Server** (default) |
+| `useState`, `useEffect`, hook custom           | Client               |
+| Animação GSAP, Lenis, Embla                    | Client               |
+| Zustand store (`cart-store`, `wishlist-store`) | Client               |
+| `react-hook-form`                              | Client               |
+| `next-themes`, `nuqs`                          | Client               |
 
 Padrão de composição: **Server faz fetch e passa dados como prop** para um
 `*-client.tsx` filho.
 
 ## 3. Estilo visual
 
-1. **Design tokens** vivem em [`@/lib/design-tokens.ts`](../lib/design-tokens.ts)
-   + variáveis CSS em `app/globals.css`. **Nunca usar cor/espaçamento
-   hardcoded.** Use Tailwind tokens (`bg-primary`, `text-foreground`,
-   `border-border`) ou as classes oficiais do design system.
+1. **Design tokens** vivem em [`@/lib/design/domain/tokens`](../lib/design/domain/tokens.ts)
+   - variáveis CSS em `src/app/globals.css`. **Nunca usar cor/espaçamento
+     hardcoded.** Use Tailwind tokens (`bg-primary`, `text-foreground`,
+     `border-border`) ou as classes oficiais do design system.
 2. **Paleta** é OKLCH (ivory + champagne gold + noir). Hex está banido
    em código novo.
 3. **Tipografia**: Poppins (sans, em uso atualmente no `layout.tsx`).

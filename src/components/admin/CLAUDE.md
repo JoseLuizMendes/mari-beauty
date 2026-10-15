@@ -8,20 +8,20 @@
 
 ## 1. Componentes atuais
 
-| Arquivo | Papel |
-| --- | --- |
-| `admin-mobile-nav.tsx` | Nav mobile do admin |
-| `cloudinary-upload.tsx` | Upload assinado (consome `/api/admin/cloudinary`) |
-| `order-status-filter.tsx` | Filtro de status de pedido |
-| `order-status-form.tsx` | Form para mudar status de pedido |
-| `product-form.tsx` | CRUD form de produto |
+| Arquivo                   | Papel                                             |
+| ------------------------- | ------------------------------------------------- |
+| `admin-mobile-nav.tsx`    | Nav mobile do admin                               |
+| `cloudinary-upload.tsx`   | Upload assinado (consome `/api/admin/cloudinary`) |
+| `order-status-filter.tsx` | Filtro de status de pedido                        |
+| `order-status-form.tsx`   | Form para mudar status de pedido                  |
+| `product-form.tsx`        | CRUD form de produto                              |
 
 ## 2. Regras
 
 1. **Imports só por rotas em `app/admin/*`.** Se um componente "admin" for
    reusado em rota pública, mova para `src/components/` raiz.
 2. **Forms** usam `react-hook-form` + `zodResolver` com schema importado
-   de `@/lib/validations`. Não duplicar regras de validação.
+   de `@/lib/shared/domain/zod-schemas`. Não duplicar regras de validação.
 3. **Submissão**: chamar `/api/admin/*` via `fetch` ou Server Action.
    Tratar `response.ok === false`, mostrar `toast.error` do Sonner.
 4. **Estados de loading**: usar `formState.isSubmitting` do RHF (ou

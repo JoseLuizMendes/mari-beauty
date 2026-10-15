@@ -28,18 +28,19 @@ sim. O grupo só evita o nome aparecer na URL.
 **Cookie = JWT assinado.** O `admin_session` guarda um token assinado (jose
 HS256, chave = `ADMIN_SECRET`) com `exp` curto (~12h) e `TOKEN_VERSION`. O
 cookie **não é mais** o `ADMIN_SECRET`. Verificação única e compartilhada:
-[`src/lib/admin-auth.ts`](../../lib/admin-auth.ts) → `verifyAdminSession` (usada
+[`src/lib/auth/presentation/admin-auth.ts`](../../lib/auth/presentation/admin-auth.ts) → `verifyAdminSession` (usada
 pelo middleware **e** por `/api/admin/cloudinary/sign`).
 
 **Dois caminhos de login** (ambos setam o mesmo cookie assinado):
+
 - **A — senha + TOTP:** server action em [`login/page.tsx`](login/page.tsx).
   Senha via hash bcrypt (`ADMIN_PASSWORD_HASH`) + código TOTP
-  (`ADMIN_TOTP_SECRET`). Lógica em [`src/lib/admin-login.ts`](../../lib/admin-login.ts).
+  (`ADMIN_TOTP_SECRET`). Lógica em [`src/lib/auth/infrastructure/persistence/admin-login.ts`](../../lib/auth/infrastructure/persistence/admin-login.ts).
   **Lockout por IP** (model `AdminLoginAttempt`) após 5 falhas → 15 min.
 - **B — Login com Google:** OAuth (arctic) com **allowlist de email**
   (`ADMIN_ALLOWLIST_EMAILS`). Rotas **públicas** `/api/admin/oauth/google` e
   `.../callback` (exceções explícitas no middleware). Lógica em
-  [`src/lib/admin-google.ts`](../../lib/admin-google.ts).
+  [`src/lib/auth/infrastructure/external/admin-google.ts`](../../lib/auth/infrastructure/external/admin-google.ts).
 
 **Rotas públicas** (pré-login, liberadas no middleware): `/admin/login`,
 `/api/admin/oauth/google`, `/api/admin/oauth/google/callback`. Não adicionar

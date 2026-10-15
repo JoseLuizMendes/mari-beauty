@@ -25,10 +25,10 @@ escopo: "Helpers consumidos pelos primitivos shadcn — utils.ts (cn, formatPric
 
 ## 1. Conteúdo atual
 
-| Arquivo | Papel |
-| --- | --- |
-| `utils.ts` | `cn()` (twMerge + clsx) e `formatPrice()` (BRL) |
-| `search/` | Reservado para utilities de busca (autocomplete, fuzzy) consumidas por Client Components — hoje vazio |
+| Arquivo    | Papel                                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------------- |
+| `utils.ts` | `cn()` (twMerge + clsx) e `formatPrice()` (BRL)                                                       |
+| `search/`  | Reservado para utilities de busca (autocomplete, fuzzy) consumidas por Client Components — hoje vazio |
 
 ---
 
@@ -72,7 +72,7 @@ Apenas helpers internos. Sem novas libs sem registrar em `[[05-Dev-Log]]`.
 
 ## 7. Histórico
 
-- **2026-05-30 (Rodada 3):** renomeado de `src/api/` → `src/shadcn-utils/`. Motivo: o nome `api/` era enganoso e confundia com `src/app/api/` (Route Handlers HTTP). Mudança envolveu `git mv` + update de `components.json` aliases + replace `@/api/` → `@/shadcn-utils/` em 72 arquivos. Registrado em `[[Ecommerce/Belessence/05-Dev-Log]]`.
+- **2026-05-30 (Rodada 3):** renomeado de `src/api/` → `src/shadcn-utils/`. Motivo: o nome `api/` era enganoso e confundia com `src/app/api/` (Route Handlers HTTP). Mudança envolveu `git mv` + update de `components.json` aliases + replace `@/shadcn-utils/` → `@/shadcn-utils/` em 72 arquivos. Registrado em `[[Ecommerce/Belessence/05-Dev-Log]]`.
 
 ---
 

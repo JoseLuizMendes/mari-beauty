@@ -28,7 +28,7 @@
 
 Polyfills jsdom (necessários por componentes): `window.matchMedia`,
 `IntersectionObserver`, `ResizeObserver`, `Element.prototype.scrollIntoView`.
-Mocks globais: `@/lib/prisma` (todos os models), `gsap`/`@gsap/react`/
+Mocks globais: `@/lib/shared/infrastructure/prisma-client` (todos os models), `gsap`/`@gsap/react`/
 `gsap/ScrollTrigger`, `lenis`. **Não re-mockar esses nos testes.**
 
 ## 4. Mocks e a estratégia de duas camadas (Prisma)

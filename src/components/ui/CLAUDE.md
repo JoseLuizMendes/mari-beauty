@@ -1,8 +1,9 @@
 # CLAUDE.md — `src/components/ui/`
 
 > Primitivos de UI gerados pelo **shadcn/ui** (style `new-york`) + Radix
-> + alguns motion helpers do projeto. **Esta pasta é parcialmente
-> "código gerado": trate as alterações com cuidado.**
+>
+> - alguns motion helpers do projeto. **Esta pasta é parcialmente
+>   "código gerado": trate as alterações com cuidado.**
 
 ---
 
@@ -21,6 +22,7 @@ Duas categorias:
 ## 2. Regras de edição
 
 ### Para primitivos shadcn:
+
 - **Preferir reinstalar** (`pnpm dlx shadcn@latest add button --overwrite`)
   a editar à mão quando atualizar a versão.
 - **Customizações permitidas**: alterar `cva` variants, adicionar tamanhos
@@ -32,6 +34,7 @@ Duas categorias:
   Não introduzir variantes de outros styles.
 
 ### Para os motion helpers locais:
+
 - Não são shadcn — pode editar livremente.
 - Documente props no topo do arquivo se ficar não-trivial.
 
@@ -39,7 +42,7 @@ Duas categorias:
 
 - **`cn()` helper**: importado de `@/shadcn-utils/utils` (peculiaridade do
   alias do projeto — `components.json` aponta `utils → @/shadcn-utils/utils`).
-  Antes do rename de 2026-05-30 era `@/api/utils`.
+  Antes do rename de 2026-05-30 era `@/shadcn-utils/utils`.
 - **`cva`** (`class-variance-authority`) para variants. Padrão:
   ```ts
   const buttonVariants = cva("base classes", {
@@ -54,7 +57,7 @@ Duas categorias:
 ## 4. Tokens e cores
 
 - Classes Tailwind referenciam **variáveis CSS** definidas em
-  `app/globals.css`: `bg-background`, `text-foreground`, `border-input`,
+  `src/app/globals.css`: `bg-background`, `text-foreground`, `border-input`,
   `ring-ring`, etc.
 - **Não hardcodar** cor em primitivo shadcn — quebra theming.
 - Modo escuro vem via classe `.dark` no `<html>` (gerenciado por
