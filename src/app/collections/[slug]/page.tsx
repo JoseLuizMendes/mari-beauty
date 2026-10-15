@@ -11,24 +11,10 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-
-const COLLECTION_MAP: Record<string, { type: string; name: string; description: string }> = {
-  "essencia-noturna": {
-    type: "night",
-    name: "Essência Noturna",
-    description: "Fragrâncias intensas e sedutoras para momentos especiais",
-  },
-  "elegancia-diurna": {
-    type: "day",
-    name: "Elegância Diurna",
-    description: "Perfumes sofisticados para o dia a dia refinado",
-  },
-  "edicao-limitada": {
-    type: "limited",
-    name: "Edição Limitada",
-    description: "Criações exclusivas em quantidades limitadas",
-  },
-};
+import { getCollection } from "@/lib/products/domain/collections";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo/domain/json-ld";
+import { siteUrl } from "@/lib/seo/infrastructure/site-url";
 
 export async function generateMetadata({
   params,
@@ -36,9 +22,19 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const collection = COLLECTION_MAP[slug];
+  const collection = getCollection(slug);
   if (!collection) return { title: "Coleção não encontrada" };
-  return { title: collection.name, description: collection.description };
+  return {
+    title: collection.name,
+    description: collection.description,
+    alternates: { canonical: `/collections/${slug}` },
+    openGraph: {
+      type: "website",
+      title: collection.name,
+      description: collection.description,
+      url: `/collections/${slug}`,
+    },
+  };
 }
 
 export default async function CollectionPage({
@@ -47,7 +43,7 @@ export default async function CollectionPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const collection = COLLECTION_MAP[slug];
+  const collection = getCollection(slug);
 
   if (!collection) notFound();
 
@@ -55,6 +51,16 @@ export default async function CollectionPage({
 
   return (
     <div className="min-h-screen bg-brand-pink flex flex-col">
+      <JsonLd
+        data={breadcrumbJsonLd(
+          [
+            { name: "Início", path: "/" },
+            { name: "Coleção", path: "/allProducts" },
+            { name: collection.name },
+          ],
+          siteUrl(),
+        )}
+      />
       <Header />
 
       <main className="flex-1 pt-24 sm:pt-28 pb-16 sm:pb-24">
@@ -80,7 +86,11 @@ export default async function CollectionPage({
               <p className="text-ink-soft mb-6">
                 Nenhuma fragrância disponível nesta coleção ainda.
               </p>
-              <Button asChild variant="outline" className="border-brand-wine text-brand-wine hover:bg-brand-wine hover:text-brand-pink">
+              <Button
+                asChild
+                variant="outline"
+                className="border-brand-wine text-brand-wine hover:bg-brand-wine hover:text-brand-pink"
+              >
                 <Link href="/allProducts">Ver todas as fragrâncias</Link>
               </Button>
             </div>

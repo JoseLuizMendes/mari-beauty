@@ -32,6 +32,17 @@ import { Search, X } from "lucide-react";
 export const metadata: Metadata = {
   title: "Coleção Essência",
   description: "Explore nossa coleção completa de fragrâncias exclusivas.",
+  // A PLP é alcançável com dezenas de combinações de `?category`,
+  // `?genero`, `?sort`, `?q` e `?show`. Todas mostram o mesmo catálogo
+  // reordenado: sem canonical, o Google indexa cada combinação como
+  // página distinta e dilui o sinal da listagem real.
+  alternates: { canonical: "/allProducts" },
+  openGraph: {
+    type: "website",
+    title: "Coleção Essência",
+    description: "Explore nossa coleção completa de fragrâncias exclusivas.",
+    url: "/allProducts",
+  },
 };
 
 interface PageProps {
@@ -75,7 +86,10 @@ type FilterState = {
   show?: number;
 };
 
-function buildHref(current: FilterState, changes: Partial<FilterState>): string {
+function buildHref(
+  current: FilterState,
+  changes: Partial<FilterState>,
+): string {
   const merged = { ...current, ...changes };
   const params = new URLSearchParams();
   if (merged.q) params.set("q", merged.q);
@@ -138,7 +152,10 @@ export default async function AllProductsPage({ searchParams }: PageProps) {
           <Breadcrumb className="mb-6 sm:mb-8">
             <BreadcrumbList className="text-[10px] tracking-[0.18em] uppercase">
               <BreadcrumbItem>
-                <BreadcrumbLink asChild className="text-ink-soft hover:text-brand-wine">
+                <BreadcrumbLink
+                  asChild
+                  className="text-ink-soft hover:text-brand-wine"
+                >
                   <Link href="/">Início</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
@@ -175,7 +192,8 @@ export default async function AllProductsPage({ searchParams }: PageProps) {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-surface-panel border border-border-subtle rounded-full text-xs text-ink-soft hover:border-brand-wine transition-colors"
               >
                 <Search className="h-3 w-3" />
-                Buscando por: <strong className="text-ink-strong">{searchQuery}</strong>
+                Buscando por:{" "}
+                <strong className="text-ink-strong">{searchQuery}</strong>
                 <X className="h-3 w-3" />
               </Link>
             </div>

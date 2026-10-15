@@ -6,7 +6,10 @@
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ProductDetailsClient from "@/components/product-details-client";
-import { getProductBySlug, getFeaturedProducts } from "@/lib/products/infrastructure/persistence/products-repository";
+import {
+  getProductBySlug,
+  getFeaturedProducts,
+} from "@/lib/products/infrastructure/persistence/products-repository";
 import { ProductCard } from "@/components/product-card";
 import {
   Breadcrumb,
@@ -20,6 +23,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { Product } from "@/lib/products/infrastructure/persistence/products-repository";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbJsonLd, productJsonLd } from "@/lib/seo/domain/json-ld";
+import { siteUrl } from "@/lib/seo/infrastructure/site-url";
 
 export async function generateMetadata({
   params,
@@ -32,6 +38,16 @@ export async function generateMetadata({
   return {
     title: product.name,
     description: product.shortDescription,
+    // Canonical explícito: a PDP é alcançável por link de coleção, de
+    // busca e de "você também vai amar". Sem isto o Google escolhe sozinho
+    // qual variante indexar.
+    alternates: { canonical: `/product/${product.slug}` },
+    openGraph: {
+      type: "website",
+      title: product.name,
+      description: product.shortDescription,
+      url: `/product/${product.slug}`,
+    },
   };
 }
 
@@ -48,8 +64,24 @@ export default async function ProductPage({
 
   if (!product) notFound();
 
+  const origin = siteUrl();
+
   return (
     <div className="min-h-screen bg-brand-pink flex flex-col">
+      {/* Preço, disponibilidade e estrelas no resultado de busca */}
+      <JsonLd
+        data={[
+          productJsonLd(product, origin),
+          breadcrumbJsonLd(
+            [
+              { name: "Início", path: "/" },
+              { name: "Coleção", path: "/allProducts" },
+              { name: product.name },
+            ],
+            origin,
+          ),
+        ]}
+      />
       <Header />
 
       <main className="flex-1 pt-24 sm:pt-28 pb-16 sm:pb-24">
@@ -58,13 +90,19 @@ export default async function ProductPage({
           <Breadcrumb className="mb-6 sm:mb-8">
             <BreadcrumbList className="text-[10px] tracking-[0.18em] uppercase">
               <BreadcrumbItem>
-                <BreadcrumbLink asChild className="text-ink-soft hover:text-brand-wine">
+                <BreadcrumbLink
+                  asChild
+                  className="text-ink-soft hover:text-brand-wine"
+                >
                   <Link href="/">Início</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink asChild className="text-ink-soft hover:text-brand-wine">
+                <BreadcrumbLink
+                  asChild
+                  className="text-ink-soft hover:text-brand-wine"
+                >
                   <Link href="/allProducts">Coleção</Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>

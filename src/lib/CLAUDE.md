@@ -20,7 +20,8 @@ só em `infrastructure/`.
 | `shared/`   | `domain/` + `infrastructure/`                        | `zod-schemas.ts` (schemas globais), `prisma-client.ts` (singleton)                                             |
 | `orders/`   | `domain/` + `application/` + `infrastructure/`       | Máquina de estados do pedido, `confirm-payment`, `orders-repository`                                           |
 | `health/`   | `domain/` + `application/ports/` + `infrastructure/` | Probes de liveness/readiness                                                                                   |
-| `products/` | `domain/` + `infrastructure/`                        | `product-status` (regras puras), `products-repository`, `product-image`                                        |
+| `products/` | `domain/` + `infrastructure/`                        | `product-status` (regras puras), `collections` (mapa público), `products-repository`, `product-image`          |
+| `seo/`      | `domain/` + `infrastructure/`                        | `json-ld` (schema.org), `og-palette` (hex p/ satori), `site-url` (origem canônica)                             |
 | `design/`   | `domain/`                                            | `tokens.ts`                                                                                                    |
 | `auth/`     | `infrastructure/` + `presentation/`                  | `admin-auth` (Edge), `admin-login` (bcrypt+TOTP), `admin-google`, `auth.ts`, `auth-actions`, `auth-gate-store` |
 | `cart/`     | `infrastructure/` + `presentation/`                  | `cart-repository`, `cart-actions`, `cart-store`                                                                |
