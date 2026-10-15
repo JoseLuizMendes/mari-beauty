@@ -85,15 +85,25 @@ pnpm db:seed        # prisma db seed
 
 ## 5. Variáveis de ambiente
 
-`DATABASE_URL`, `ADMIN_SECRET`, `AUTH_SECRET`, credenciais Mercado Pago,
-Cloudinary e Resend. Lista canônica em `.env.example`.
+Lista canônica em `.env.example`. **O ambiente é validado com Zod no boot** —
+[`src/lib/shared/infrastructure/env.ts`](src/lib/shared/infrastructure/env.ts),
+disparado por [`instrumentation.ts`](instrumentation.ts).
 
-- Em código server-side, ler via `process.env.*`.
-- Em client-side só `NEXT_PUBLIC_*`.
+O schema tem dois níveis:
 
-> ⚠️ Ainda **não há validação de ambiente no boot** — a app sobe com variável
-> faltando e quebra na primeira requisição que precisar dela. Está na Onda 0
-> de [`docs/AUDITORIA-2026-10.md`](docs/AUDITORIA-2026-10.md).
+| Nível                 | Variáveis                                           | Se faltar                                                             |
+| --------------------- | --------------------------------------------------- | --------------------------------------------------------------------- |
+| **Núcleo**            | `DATABASE_URL`, `ADMIN_SECRET`, `AUTH_SECRET`       | O servidor **não sobe**. O erro lista todas as pendências de uma vez. |
+| **Grupos de feature** | Cloudinary, OAuth Google, login admin, Mercado Pago | A feature é desligada e o boot **avisa no console** quais e por quê.  |
+
+- Em server-side, importar de `@/lib/shared/infrastructure/env` em vez de ler
+  `process.env` direto. As duas exceções estão documentadas no `CLAUDE.md`
+  daquele diretório.
+- Em client-side só `NEXT_PUBLIC_*`, e sempre literal — o Next precisa do
+  texto `process.env.NEXT_PUBLIC_X` para inlinar no bundle.
+
+> O núcleo é exatamente o que o CI define. Promover variável a núcleo sem
+> acrescentá-la ao workflow quebra o pipeline.
 
 ## 6. Regras de alto nível
 
