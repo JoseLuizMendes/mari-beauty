@@ -4,6 +4,7 @@
 
 import { prisma } from "@/lib/shared/infrastructure/prisma-client";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { formatPrice } from "@/shadcn-utils/utils";
 import { ArrowLeft } from "lucide-react";
@@ -102,12 +103,13 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                   key={item.id}
                   className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
                 >
-                  <div className="w-14 h-14 rounded-token-sm overflow-hidden bg-admin-panel-soft flex-shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                  <div className="relative w-14 h-14 rounded-token-sm overflow-hidden bg-admin-panel-soft flex-shrink-0">
+                    <Image
                       src={productImageSrc(item.imageUrl)}
                       alt={item.productName}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="56px"
+                      className="object-cover"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -143,7 +145,10 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           {/* RESUMO — committed moment desta página */}
           <CommittedPanel eyebrow="Resumo">
             <dl className="space-y-2 text-sm">
-              <Row label="Subtotal" value={formatPrice(Number(order.subtotal))} />
+              <Row
+                label="Subtotal"
+                value={formatPrice(Number(order.subtotal))}
+              />
               {Number(order.discount) > 0 && (
                 <Row
                   label="Desconto"
@@ -151,7 +156,10 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
                   tone="positive"
                 />
               )}
-              <Row label="Frete" value={formatPrice(Number(order.shippingCost))} />
+              <Row
+                label="Frete"
+                value={formatPrice(Number(order.shippingCost))}
+              />
               <div className="h-px bg-brand-pink/20 my-3" />
               <div className="flex justify-between text-base font-medium">
                 <span>Total</span>
@@ -210,7 +218,11 @@ function Field({
       <dt className="text-[10px] tracking-[0.22em] uppercase text-ink-muted mb-1">
         {label}
       </dt>
-      <dd className={mono ? "text-ink-strong font-data text-xs" : "text-ink-strong"}>
+      <dd
+        className={
+          mono ? "text-ink-strong font-data text-xs" : "text-ink-strong"
+        }
+      >
         {children}
       </dd>
     </div>

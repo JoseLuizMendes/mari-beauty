@@ -15,23 +15,24 @@ A profundidade de camadas **varia de propósito**: domínio com regra de
 negócio real ganha `domain/` e `application/`; CRUD e wrapper de SDK ficam
 só em `infrastructure/`.
 
-| Contexto    | Camadas                                              | Conteúdo                                                                                                       |
-| ----------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `shared/`   | `domain/` + `infrastructure/`                        | `zod-schemas.ts` (schemas globais), `prisma-client.ts` (singleton)                                             |
-| `orders/`   | `domain/` + `application/` + `infrastructure/`       | Máquina de estados do pedido, `confirm-payment`, `orders-repository`                                           |
-| `health/`   | `domain/` + `application/ports/` + `infrastructure/` | Probes de liveness/readiness                                                                                   |
-| `products/` | `domain/` + `infrastructure/`                        | `product-status` (regras puras), `collections` (mapa público), `products-repository`, `product-image`          |
-| `seo/`      | `domain/` + `infrastructure/`                        | `json-ld` (schema.org), `og-palette` (hex p/ satori), `site-url` (origem canônica)                             |
-| `design/`   | `domain/`                                            | `tokens.ts`                                                                                                    |
-| `auth/`     | `infrastructure/` + `presentation/`                  | `admin-auth` (Edge), `admin-login` (bcrypt+TOTP), `admin-google`, `auth.ts`, `auth-actions`, `auth-gate-store` |
-| `cart/`     | `infrastructure/` + `presentation/`                  | `cart-repository`, `cart-actions`, `cart-store`                                                                |
-| `wishlist/` | `infrastructure/` + `presentation/`                  | `wishlist-repository`, `wishlist-actions`, `wishlist-store`                                                    |
-| `coupons/`  | `infrastructure/`                                    | `coupons-repository`                                                                                           |
-| `reviews/`  | `infrastructure/`                                    | `reviews-repository`                                                                                           |
-| `shipping/` | `infrastructure/`                                    | `shipping.ts` (ViaCEP + frete por UF)                                                                          |
-| `payment/`  | `infrastructure/`                                    | `payment-provider.ts` — **hoje é mock**                                                                        |
-| `motion/`   | `presentation/`                                      | `gsap-helpers.ts` — **client-only**                                                                            |
-| `hooks/`    | —                                                    | React hooks client-only (ver [hooks/CLAUDE.md](hooks/CLAUDE.md))                                               |
+| Contexto         | Camadas                                              | Conteúdo                                                                                                       |
+| ---------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `shared/`        | `domain/` + `infrastructure/`                        | `zod-schemas.ts` (schemas globais), `prisma-client.ts` (singleton)                                             |
+| `orders/`        | `domain/` + `application/` + `infrastructure/`       | Máquina de estados do pedido, `confirm-payment`, `orders-repository`                                           |
+| `health/`        | `domain/` + `application/ports/` + `infrastructure/` | Probes de liveness/readiness                                                                                   |
+| `products/`      | `domain/` + `infrastructure/`                        | `product-status` (regras puras), `collections` (mapa público), `products-repository`, `product-image`          |
+| `seo/`           | `domain/` + `infrastructure/`                        | `json-ld` (schema.org), `og-palette` (hex p/ satori), `site-url` (origem canônica)                             |
+| `observability/` | `domain/`                                            | `sentry-scrub` — filtro de dado sensível do `beforeSend`                                                       |
+| `design/`        | `domain/`                                            | `tokens.ts`                                                                                                    |
+| `auth/`          | `infrastructure/` + `presentation/`                  | `admin-auth` (Edge), `admin-login` (bcrypt+TOTP), `admin-google`, `auth.ts`, `auth-actions`, `auth-gate-store` |
+| `cart/`          | `infrastructure/` + `presentation/`                  | `cart-repository`, `cart-actions`, `cart-store`                                                                |
+| `wishlist/`      | `infrastructure/` + `presentation/`                  | `wishlist-repository`, `wishlist-actions`, `wishlist-store`                                                    |
+| `coupons/`       | `infrastructure/`                                    | `coupons-repository`                                                                                           |
+| `reviews/`       | `infrastructure/`                                    | `reviews-repository`                                                                                           |
+| `shipping/`      | `infrastructure/`                                    | `shipping.ts` (ViaCEP + frete por UF)                                                                          |
+| `payment/`       | `infrastructure/`                                    | `payment-provider.ts` — **hoje é mock**                                                                        |
+| `motion/`        | `presentation/`                                      | `gsap-helpers.ts` — **client-only**                                                                            |
+| `hooks/`         | —                                                    | React hooks client-only (ver [hooks/CLAUDE.md](hooks/CLAUDE.md))                                               |
 
 Convenção de sufixo: `*-repository.ts` (Prisma), `*-actions.ts`
 (Server Actions, `"use server"`), `*-store.ts` (Zustand, client-only).

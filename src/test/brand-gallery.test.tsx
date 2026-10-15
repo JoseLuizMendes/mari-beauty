@@ -1,6 +1,6 @@
 /**
  * Testes — BrandGallery
- * Foco: heading editorial, 7 slides com captions, controles de navegação,
+ * Foco: heading editorial, 6 slides com captions, controles de navegação,
  * dots, chamadas em emblaApi quando clica em prev/next/dot.
  *
  * Mocks:
@@ -36,10 +36,12 @@ vi.mock("embla-carousel-autoplay", () => ({
 }));
 
 vi.mock("next/image", () => ({
-  default: (props: ImgHTMLAttributes<HTMLImageElement> & {
-    fill?: boolean;
-    priority?: boolean;
-  }) => {
+  default: (
+    props: ImgHTMLAttributes<HTMLImageElement> & {
+      fill?: boolean;
+      priority?: boolean;
+    },
+  ) => {
     const { fill: _fill, priority: _priority, ...rest } = props;
     void _fill;
     void _priority;
@@ -65,7 +67,7 @@ describe("BrandGallery", () => {
     expect(screen.getByText(/campanha 2026/i)).toBeInTheDocument();
   });
 
-  it("renderiza 7 slides com captions específicos", () => {
+  it("renderiza 6 slides com captions específicos", () => {
     render(<BrandGallery />);
     const captions = [
       /essência inaugural/i,
@@ -73,12 +75,18 @@ describe("BrandGallery", () => {
       /silagem prolongada/i,
       /coração de rosa/i,
       /acorde boisé/i,
-      /vetiver & musc/i,
       /accord ultime/i,
     ];
     for (const c of captions) {
       expect(screen.getByText(c)).toBeInTheDocument();
     }
+  });
+
+  it("não renderiza o slide órfão 'Vetiver & Musc'", () => {
+    // Era o 06 e apontava para um arquivo que nunca existiu no repositório.
+    // Chegando a imagem, a entrada volta à galeria e este teste sai.
+    render(<BrandGallery />);
+    expect(screen.queryByText(/vetiver & musc/i)).not.toBeInTheDocument();
   });
 
   it("renderiza controles de navegação 'Imagem anterior' e 'Próxima'", () => {
@@ -105,7 +113,7 @@ describe("BrandGallery", () => {
     expect(scrollPrev).toHaveBeenCalledOnce();
   });
 
-  it("renderiza 7 dots com aria-label 'Ir para <caption>'", () => {
+  it("renderiza 6 dots com aria-label 'Ir para <caption>'", () => {
     render(<BrandGallery />);
     expect(
       screen.getByRole("button", { name: /ir para essência inaugural/i }),

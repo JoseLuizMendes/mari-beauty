@@ -1,0 +1,25 @@
+<!--
+  Fallback de `productImageSrc()` para produto sem imagem.
+
+  Existia só no código: `src/lib/products/infrastructure/external/product-image.ts`
+  devolvia este caminho e o arquivo nunca foi criado, então todo produto sem
+  foto servia 404 — na listagem, na PDP, no carrinho e no admin.
+
+  SVG de propósito: é o único raster-substituto que não precisa de conversão
+  AVIF/WebP e escala em qualquer slot sem perder nitidez. As cores são as da
+  marca (wine #47131C sobre rosé #FFD7E7); se a paleta mudar no globals.css,
+  mude aqui também — não há token em arquivo estático.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Imagem indisponível">
+  <rect width="600" height="600" fill="#FFE8F0"/>
+  <g fill="none" stroke="#47131C" stroke-opacity="0.28" stroke-width="6" stroke-linejoin="round">
+    <path d="M262 150h76v44h-76z"/>
+    <path d="M248 194h104a34 34 0 0 1 34 34v188a34 34 0 0 1-34 34H248a34 34 0 0 1-34-34V228a34 34 0 0 1 34-34z"/>
+    <path d="M214 316h172"/>
+  </g>
+  <text x="300" y="492" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif" font-size="26"
+        fill="#47131C" fill-opacity="0.45" letter-spacing="3">
+    MARI BEAUTY
+  </text>
+</svg>

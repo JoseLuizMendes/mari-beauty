@@ -123,6 +123,7 @@ describe("grupos de feature", () => {
       adminGoogleOAuth: false,
       cloudinary: false,
       mercadoPago: false,
+      sentry: false,
     });
   });
 });
@@ -131,7 +132,7 @@ describe("validateEnvAtBoot", () => {
   it("relata cada feature desligada", () => {
     setEnv(VALID_CORE);
     const lines = validateEnvAtBoot();
-    expect(lines).toHaveLength(4);
+    expect(lines).toHaveLength(5);
     expect(lines.join("\n")).toContain("mercadoPago: DESLIGADA");
   });
 
@@ -146,6 +147,7 @@ describe("validateEnvAtBoot", () => {
       CLOUDINARY_API_KEY: "k",
       CLOUDINARY_API_SECRET: "s",
       MP_ACCESS_TOKEN: "token",
+      NEXT_PUBLIC_SENTRY_DSN: "https://abc@o1.ingest.sentry.io/2",
     });
     expect(validateEnvAtBoot()).toEqual([]);
   });

@@ -29,6 +29,14 @@ Rodar via `pnpm <script>` ou `node scripts/<file>` / `tsx scripts/<file>`. Cada 
 - Rodar via `tsx scripts/<file>` ou `node scripts/<file.mjs>`.
 - Não importar `src/lib/*` server-only se rodar fora do Next runtime.
 
+### Conteúdo
+
+- `otimizar-imagens.mjs` — converte os rasters de `public/` para AVIF + WebP
+  (`pnpm imagens:otimizar`). Portado do `otimizar-fotos.mjs` do
+  `dr-gabriel-cavalcante-web`, com duas mudanças documentadas no cabeçalho do
+  arquivo: emite AVIF além de WebP, e varre o diretório em vez de ter receita
+  por foto.
+
 ---
 
 ## Stack Local
@@ -39,7 +47,9 @@ Conforme `[[Preferencias Dev]]`.
 
 ## Testes
 
-Smoke-test manual após mudanças.
+Smoke-test manual após mudanças. O resultado do `otimizar-imagens.mjs` é
+verificado no CI por `src/test/asset-refs.test.ts`, que falha se algum
+PNG/JPG ficar sem par AVIF/WebP.
 
 ---
 
