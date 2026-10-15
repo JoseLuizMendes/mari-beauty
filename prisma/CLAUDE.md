@@ -82,19 +82,20 @@ local que vai ser descartado.
 - **N+1**: usar `include` / `select` no Prisma para trazer relações em uma
   query. Em loops, prefira `findMany` único com `where: { id: { in } }`.
 - **Pagination**: cursor-based para listas longas; offset só para admin.
-- **Connection pool**: gerenciado pelo `Pool` em `src/lib/prisma.ts`.
+- **Connection pool**: gerenciado pelo `Pool` em `src/lib/shared/infrastructure/prisma-client.ts`.
   Em ambiente serverless, considerar PgBouncer/Neon pooler.
 
 ## 7. Status de ciclo de vida (Product/Order)
 
 O domínio tem máquinas de estado documentadas no schema (`ProductStatus`,
 `OrderStatus`). Transições válidas:
+
 - **Order**: `PENDING → PAID → SHIPPED → DELIVERED` (ou `CANCELED` de
   qualquer ponto antes de `SHIPPED`).
 - **Product**: `NORMAL ↔ PROMOTION`, `COMING_SOON → NORMAL`,
   `* → DISCONTINUED`.
 
-Lógica de transição vive em `src/lib/product-status.ts` — não duplicar.
+Lógica de transição vive em `src/lib/products/domain/product-status.ts` — não duplicar.
 
 ## 8. Não faça
 

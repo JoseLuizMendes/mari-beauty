@@ -6,16 +6,16 @@
 
 ## 1. Mapa do diretório
 
-| Pasta | Papel |
-| --- | --- |
-| `app/` | App Router: páginas, layouts, Route Handlers, route groups. |
-| `components/` | Componentes React (UI shadcn + de domínio + admin). |
-| `lib/` | Lógica server-side, acesso ao banco, regras de negócio, stores. |
-| `lib/hooks/` | React hooks client-only. |
-| `api/` | Utilitários do shadcn (alias `@/api` em `components.json`). |
-| `test/` | Setup e suites Vitest. |
-| `generated/` | **Prisma client gerado — proibido editar.** |
-| `middleware.ts` | Auth de `/admin/*` e `/api/admin/*`. |
+| Pasta           | Papel                                                                |
+| --------------- | -------------------------------------------------------------------- |
+| `app/`          | App Router: páginas, layouts, Route Handlers, route groups.          |
+| `components/`   | Componentes React (UI shadcn + de domínio + admin).                  |
+| `lib/`          | Lógica server-side, acesso ao banco, regras de negócio, stores.      |
+| `lib/hooks/`    | React hooks client-only.                                             |
+| `shadcn-utils/` | Utilitários do shadcn (alias `@/shadcn-utils` em `components.json`). |
+| `test/`         | Setup e suites Vitest.                                               |
+| `generated/`    | **Prisma client gerado — proibido editar.**                          |
+| `middleware.ts` | Auth de `/admin/*` e `/api/admin/*`.                                 |
 
 ## 2. Regras de fronteira (importantes)
 
@@ -40,6 +40,7 @@ admin/  ──┘                    ▲
 ## 3. Server vs Client — checklist mental
 
 Antes de adicionar `"use client"`:
+
 1. Preciso de `useState`, `useEffect`, `useRef`, evento de DOM, ou contexto
    client? Se **não**, deixe RSC.
 2. O componente fala com browser APIs (window, localStorage)? → client.
@@ -54,7 +55,7 @@ Client Components em vez de tornar a árvore inteira client.
 - Acesso ao Prisma só em arquivos server (sem `"use client"`) e Route
   Handlers. Para garantir, prefira importar `prisma` apenas em
   `src/lib/*-db.ts` e nos handlers de `app/api/`.
-- Schemas Zod em [`src/lib/validations.ts`](lib/validations.ts) são
+- Schemas Zod em [`src/lib/shared/domain/zod-schemas.ts`](lib/shared/domain/zod-schemas.ts) são
   **compartilhados** client+server (forms + handlers).
 - Tipos do Prisma podem ser re-exportados de `lib/` para uso em
   componentes; **nunca** importar de `src/generated/` direto fora de

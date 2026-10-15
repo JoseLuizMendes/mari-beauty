@@ -7,17 +7,17 @@
 
 ## 1. Anatomia das rotas
 
-| Convenção | Arquivo |
-| --- | --- |
-| Página | `page.tsx` |
-| Layout (compartilhado/persistente) | `layout.tsx` |
-| Template (remount por navegação) | `template.tsx` |
-| Loading UI | `loading.tsx` |
-| Error boundary | `error.tsx` (Client) ou `global-error.tsx` |
-| Not found | `not-found.tsx` |
-| Route Handler | `route.ts` |
-| Route group (não vira URL) | `(grupo)/` |
-| Param dinâmico | `[slug]/page.tsx` |
+| Convenção                          | Arquivo                                    |
+| ---------------------------------- | ------------------------------------------ |
+| Página                             | `page.tsx`                                 |
+| Layout (compartilhado/persistente) | `layout.tsx`                               |
+| Template (remount por navegação)   | `template.tsx`                             |
+| Loading UI                         | `loading.tsx`                              |
+| Error boundary                     | `error.tsx` (Client) ou `global-error.tsx` |
+| Not found                          | `not-found.tsx`                            |
+| Route Handler                      | `route.ts`                                 |
+| Route group (não vira URL)         | `(grupo)/`                                 |
+| Param dinâmico                     | `[slug]/page.tsx`                          |
 
 Rotas pt-BR atuais: `/`, `/sobre`, `/contato`, `/ajuda`, `/favoritos`,
 `/meus-pedidos`, `/checkout`, `/sucesso/[id]`, `/collections/[slug]`,
@@ -26,7 +26,7 @@ Rotas pt-BR atuais: `/`, `/sobre`, `/contato`, `/ajuda`, `/favoritos`,
 **Autenticação do cliente (Auth.js v5):** o route handler
 `api/auth/[...nextauth]/route.ts` expõe `/api/auth/*`. As páginas `/entrar`
 e `/cadastro` usam `AuthPanel`. A sessão é JWT (provider de credenciais);
-config em [`src/lib/auth.ts`](../lib/auth.ts). **É separada do admin** —
+config em [`src/lib/auth/infrastructure/external/auth.ts`](../lib/auth/infrastructure/external/auth.ts). **É separada do admin** —
 `/admin/*` continua protegido pelo cookie `admin_session` no middleware,
 que **não** foi alterado. `/checkout` valida sessão no servidor (`auth()`)
 e redireciona para `/entrar?callbackUrl=/checkout` se deslogado.
@@ -41,7 +41,11 @@ e redireciona para `/entrar?callbackUrl=/checkout` se deslogado.
    fazer `fetch('/api/...')` dentro de RSC.
 3. **Params/searchParams**: no Next 15+, são **Promise**. Aguardar:
    ```ts
-   export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+   export default async function Page({
+     params,
+   }: {
+     params: Promise<{ slug: string }>;
+   }) {
      const { slug } = await params;
    }
    ```

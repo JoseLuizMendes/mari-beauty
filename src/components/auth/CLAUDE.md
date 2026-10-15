@@ -27,7 +27,7 @@ Auth dialog, auth form, account menu, session sync. Server/Client mix conforme c
 
 - Componentes UI de auth: `auth-dialog`, `auth-form`, `auth-panel`, `account-menu`, `auth-data-sync`.
 - Modal `auth-gate` guarda ação pendente e executa após login.
-- Stores Zustand de auth vivem em `src/lib/auth-gate-store.ts`.
+- Stores Zustand de auth vivem em `src/lib/auth/presentation/auth-gate-store.ts`.
 
 ---
 

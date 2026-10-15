@@ -26,7 +26,7 @@ Endpoint REST para Client Components / clientes externos. NÃO consumir daqui em
 ## Diretrizes Específicas
 
 - Endpoint HTTP do App Router (Route Handler).
-- TODA entrada via Zod (`src/lib/validations.ts`).
+- TODA entrada via Zod (`src/lib/shared/domain/zod-schemas.ts`).
 - Re-validar preço, estoque, cupom — NUNCA confiar no client.
 - Server Components NÃO consomem este endpoint — usam `src/lib/*-db` direto.
 - Retornar `NextResponse.json(...)` com status apropriado.

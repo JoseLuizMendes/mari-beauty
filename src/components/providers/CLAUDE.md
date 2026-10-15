@@ -1,6 +1,6 @@
 # CLAUDE.md — `src/components/providers/`
 
-> Providers globais montados em `app/layout.tsx`. Client Components que
+> Providers globais montados em `src/app/layout.tsx`. Client Components que
 > envolvem toda a árvore.
 
 ---
@@ -14,7 +14,7 @@
 
 1. **Providers são Client Components.** Marque `"use client"` no topo.
 2. **Não fazer fetch** nem chamar Prisma daqui — provider é só wiring.
-3. **Montar uma vez** — providers vivem em `app/layout.tsx`, nunca em
+3. **Montar uma vez** — providers vivem em `src/app/layout.tsx`, nunca em
    `page.tsx`.
 4. **Cleanup obrigatório** em `useEffect`: Lenis precisa de `destroy()`,
    listeners precisam ser removidos. Vazamento aqui afeta toda a app.
@@ -41,7 +41,7 @@ A ordem importa para que contextos internos vejam externos:
 1. Criar `src/components/providers/<nome>-provider.tsx` com
    `"use client"`.
 2. Exportar componente `PascalCase` aceitando `{ children: ReactNode }`.
-3. Importar em `app/layout.tsx` e posicionar conforme dependências.
+3. Importar em `src/app/layout.tsx` e posicionar conforme dependências.
 4. Atualizar a tabela acima neste arquivo.
 
 ## 5. Não faça

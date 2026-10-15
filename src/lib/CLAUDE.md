@@ -1,42 +1,44 @@
 # CLAUDE.md — `src/lib/`
 
 > Coração lógico do app: acesso a dados, regras de negócio, stores,
-> tokens de design, integrações. **Trate como "domain layer".**
+> tokens de design, integrações.
+>
+> **Organizado por bounded context**, não por tipo de arquivo. Cada pasta
+> de primeiro nível é um domínio com `CLAUDE.md` próprio — leia o do
+> domínio em que for mexer.
 
 ---
 
 ## 1. Mapa atual
 
-| Arquivo | Responsabilidade | Server/Client |
-| --- | --- | --- |
-| `prisma.ts` | Singleton do Prisma Client (config SSL explícita no Pool) | **Server-only** |
-| `products-db.ts` | Queries de produto (inclui filtro de `gender`) | Server-only |
-| `coupons.ts` | Regras e validação de cupom | Server-only |
-| `shipping.ts` | Cálculo de frete por UF | Server-only |
-| `payment-provider.ts` | Wrapper Mercado Pago | Server-only |
-| `auth.ts` | Config do Auth.js v5 (NextAuth) — providers, callbacks | **Server-only** |
-| `auth-actions.ts` | Server Action `registerUser` (cadastro credenciais) | **Server-only** (`"use server"`) |
-| `admin-auth.ts` | Cookie de sessão admin assinado (jose) — `verifyAdminSession` | **Server-only (Edge-safe — só jose)** |
-| `admin-login.ts` | Login admin: bcrypt + TOTP + lockout | **Server-only (Node)** |
-| `admin-google.ts` | OAuth Google do admin (arctic) + allowlist de email | **Server-only (Node)** |
-| `wishlist-db.ts` | Queries da wishlist por usuário | **Server-only** |
-| `wishlist-actions.ts` | Server Actions da wishlist (auth + db) | **Server-only** (`"use server"`) |
-| `cart-db.ts` | Queries do carrinho por usuário (preço relido do banco) | **Server-only** |
-| `cart-actions.ts` | Server Actions do carrinho (auth + db) | **Server-only** (`"use server"`) |
-| `product-status.ts` | Lógica de status (NOVO, PROMOÇÃO, ESGOTADO) | Compartilhado |
-| `product-image.ts` | Helpers de imagem/Cloudinary | Compartilhado |
-| `validations.ts` | Schemas Zod (form + handler; inclui login/cadastro) | Compartilhado |
-| `design-tokens.ts` | Tokens OKLCH + tipografia + espaçamento | Compartilhado |
-| `gsap-utils.ts` | Helpers de motion | **Client-only** |
-| `cart-store.ts` | Zustand — **cache** do carrinho do servidor (sem persist) | **Client-only** |
-| `wishlist-store.ts` | Zustand — **cache** dos favoritos do servidor (sem persist) | **Client-only** |
-| `auth-gate-store.ts` | Zustand — modal de login que bloqueia ações | **Client-only** |
-| `hooks/` | React hooks (inclui `use-require-auth`) | **Client-only** (ver [hooks/CLAUDE.md](hooks/CLAUDE.md)) |
+A profundidade de camadas **varia de propósito**: domínio com regra de
+negócio real ganha `domain/` e `application/`; CRUD e wrapper de SDK ficam
+só em `infrastructure/`.
+
+| Contexto    | Camadas                                              | Conteúdo                                                                                                       |
+| ----------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `shared/`   | `domain/` + `infrastructure/`                        | `zod-schemas.ts` (schemas globais), `prisma-client.ts` (singleton)                                             |
+| `orders/`   | `domain/` + `application/` + `infrastructure/`       | Máquina de estados do pedido, `confirm-payment`, `orders-repository`                                           |
+| `health/`   | `domain/` + `application/ports/` + `infrastructure/` | Probes de liveness/readiness                                                                                   |
+| `products/` | `domain/` + `infrastructure/`                        | `product-status` (regras puras), `products-repository`, `product-image`                                        |
+| `design/`   | `domain/`                                            | `tokens.ts`                                                                                                    |
+| `auth/`     | `infrastructure/` + `presentation/`                  | `admin-auth` (Edge), `admin-login` (bcrypt+TOTP), `admin-google`, `auth.ts`, `auth-actions`, `auth-gate-store` |
+| `cart/`     | `infrastructure/` + `presentation/`                  | `cart-repository`, `cart-actions`, `cart-store`                                                                |
+| `wishlist/` | `infrastructure/` + `presentation/`                  | `wishlist-repository`, `wishlist-actions`, `wishlist-store`                                                    |
+| `coupons/`  | `infrastructure/`                                    | `coupons-repository`                                                                                           |
+| `reviews/`  | `infrastructure/`                                    | `reviews-repository`                                                                                           |
+| `shipping/` | `infrastructure/`                                    | `shipping.ts` (ViaCEP + frete por UF)                                                                          |
+| `payment/`  | `infrastructure/`                                    | `payment-provider.ts` — **hoje é mock**                                                                        |
+| `motion/`   | `presentation/`                                      | `gsap-helpers.ts` — **client-only**                                                                            |
+| `hooks/`    | —                                                    | React hooks client-only (ver [hooks/CLAUDE.md](hooks/CLAUDE.md))                                               |
+
+Convenção de sufixo: `*-repository.ts` (Prisma), `*-actions.ts`
+(Server Actions, `"use server"`), `*-store.ts` (Zustand, client-only).
 
 > **Carrinho e favoritos são privados por usuário, no banco.** As stores
-> Zustand (`cart-store`/`wishlist-store`) **não** usam mais `localStorage`:
+> Zustand (`cart-store`/`wishlist-store`) **não** usam `localStorage`:
 > são cache hidratado do servidor no login e zerado no logout (ver
-> `components/auth/auth-data-sync.tsx`). Mutações são otimistas e
+> `src/components/auth/auth-data-sync.tsx`). Mutações são otimistas e
 > sincronizam via Server Actions com rollback. **Nunca** voltar a persistir
 > esses dados em `localStorage` global — vaza dados entre usuários.
 
@@ -49,19 +51,23 @@
 2. **Client-only**: Zustand stores e GSAP helpers devem usar
    `import "client-only"` (ou viver atrás de `"use client"` em quem
    importa).
-3. **Sem React aqui** (exceto hooks/). `lib/` é lógica pura — fica
-   testável e reutilizável.
+3. **Sem React aqui** (exceto `hooks/` e `*-store.ts`). `lib/` é lógica —
+   fica testável e reutilizável.
 4. **Funções puras > classes.** Não há motivo para classes nesta camada.
 5. **Erros de domínio** devem ter mensagens em pt-BR estáveis (vão para
    toasts). Erros de programação podem ser em inglês.
+6. **Regra de negócio nova** num contexto que só tem `infrastructure/`:
+   crie o `domain/` dele. Não espalhe regra em route handler nem em
+   repository.
 
 ## 3. Prisma singleton
 
-[`prisma.ts`](prisma.ts) é o **único** lugar onde `PrismaClient` é
-instanciado. Importar dele em todos os `*-db.ts` e Route Handlers:
+[`shared/infrastructure/prisma-client.ts`](shared/infrastructure/prisma-client.ts)
+é o **único** lugar onde `PrismaClient` é instanciado. Importar dele em
+todos os `*-repository.ts` e Route Handlers:
 
 ```ts
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/shared/infrastructure/prisma-client";
 ```
 
 **Não** criar `new PrismaClient()` em nenhum outro arquivo — em dev gera
@@ -69,37 +75,42 @@ múltiplas conexões e vaza pool.
 
 ## 4. Validações Zod
 
-- Schemas em [`validations.ts`](validations.ts) são a fonte única de
-  verdade para shape de input. Forms (RHF + `zodResolver`) e Route
-  Handlers (`safeParse`) consomem o mesmo schema.
+- Schemas em [`shared/domain/zod-schemas.ts`](shared/domain/zod-schemas.ts)
+  são a fonte única de verdade para shape de input **compartilhado**. Forms
+  (RHF + `zodResolver`) e Route Handlers (`safeParse`) consomem o mesmo
+  schema.
+- Schema usado por um único bounded context fica junto do use case dele,
+  não aqui.
 - Helpers (CPF, CEP) já existem — reutilize antes de criar novos.
 - Mensagens de erro Zod em **pt-BR** (`.min(1, "Nome obrigatório")`).
 
 ## 5. Stores Zustand
 
-- Stores são **client-only**. Padrão atual:
-  ```ts
-  import { create } from "zustand";
-  import { persist } from "zustand/middleware";
-  export const useCartStore = create(persist(...));
-  ```
-- Hidratação: cuidado com mismatch SSR ↔ client em stores persistidas.
-  Usar `useHasMounted` (ver [hooks/CLAUDE.md](hooks/CLAUDE.md)).
+- Stores são **client-only** e vivem em `<contexto>/presentation/`.
+- **Sem `persist`** em carrinho e favoritos — ver nota da seção 1.
+- Hidratação: cuidado com mismatch SSR ↔ client. Usar `useHasMounted`
+  (ver [hooks/CLAUDE.md](hooks/CLAUDE.md)).
 - Selectors finos para evitar re-render geral: `useCartStore(s => s.count)`.
 
 ## 6. Pagamento e dinheiro
 
 - Preços vêm como **`Decimal`** do Prisma. **Nunca usar `number` para
   cálculo monetário** — converter para string ou usar lib `decimal.js`.
-- `payment-provider.ts` é a **única** porta para Mercado Pago. Trocar
-  provedor = trocar essa implementação, contrato externo se mantém.
-- Webhook de pagamento confirma Order **e** dá baixa em estoque, em
-  transação atômica. Idempotente por `paymentId`.
+- [`payment/infrastructure/external/payment-provider.ts`](payment/infrastructure/external/payment-provider.ts)
+  é a **única** porta para o gateway. Trocar provedor = trocar essa
+  implementação, contrato externo se mantém.
+- ⚠️ **O provider hoje é mock e sempre retorna `approved`.** Ver P0.1 em
+  [`docs/AUDITORIA-2026-10.md`](../../docs/AUDITORIA-2026-10.md).
+- [`orders/application/confirm-payment.ts`](orders/application/confirm-payment.ts)
+  é idempotente por `paymentId` e já aceita `source: "webhook"` — o caminho
+  para o gateway real está pavimentado.
 
 ## 7. Tokens de design
 
-- [`design-tokens.ts`](design-tokens.ts) é a **fonte única**. Cores
-  (OKLCH), tipografia, espaçamento. Nunca hardcodar paleta em componente.
+- [`design/domain/tokens.ts`](design/domain/tokens.ts) é a **fonte única**
+  em TypeScript; os valores CSS vivem em `src/app/globals.css`. Cores
+  (**hex**, não OKLCH), tipografia, espaçamento. Nunca hardcodar paleta em
+  componente.
 - Se precisar de cor que não está nos tokens: **adicione ao tokens
   primeiro**, depois use.
 
@@ -110,3 +121,5 @@ múltiplas conexões e vaza pool.
   perde tipos e segurança.
 - Não esconder erro de banco em `try/catch` vazio — propague ou logue.
 - Não duplicar validação Zod em handler + form; importe do mesmo lugar.
+- Não mover arquivo sem atualizar o `CLAUDE.md` do diretório — o CI
+  verifica (`src/test/claude-md-paths.test.ts`).
