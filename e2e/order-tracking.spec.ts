@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
-import { getOrderStatus, getOrderEvents, closeDb } from "./support/db";
-import { loginAsUser } from "./support/auth";
+import {
+  getOrderStatus,
+  getOrderEvents,
+  clearCart,
+  closeDb,
+} from "./support/db";
+import { loginAsUser, TEST_USER } from "./support/auth";
 
 /**
  * E2E — Rastreamento de pedido após pagamento aprovado.
@@ -27,6 +32,14 @@ import { loginAsUser } from "./support/auth";
 
 const SLUG = "midnight-velvet";
 const EMAIL = `e2e-tracking+${Date.now()}@belessence.test`;
+
+// Carrinho é estado compartilhado no banco (mesmo `e2e-user` em todos os
+// specs) e sobrevive a retries e a execuções inteiras. Sem este reset, um
+// spec que morre depois de "adicionar à bag" faz o checkout seguinte levar
+// o item órfão junto e derruba a asserção de estoque. Ver `clearCart`.
+test.beforeEach(async () => {
+  await clearCart(TEST_USER.id);
+});
 
 test.afterAll(async () => {
   await closeDb();

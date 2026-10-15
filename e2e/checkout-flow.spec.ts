@@ -3,9 +3,10 @@ import {
   getStockBySlug,
   getCouponUsedCount,
   countOrdersByEmail,
+  clearCart,
   closeDb,
 } from "./support/db";
-import { loginAsUser } from "./support/auth";
+import { loginAsUser, TEST_USER } from "./support/auth";
 
 /**
  * E2E — Fluxo de checkout completo (regra crítica em BANCO REAL)
@@ -23,6 +24,14 @@ import { loginAsUser } from "./support/auth";
 const SLUG = "midnight-velvet";
 // Email único por execução → asserção determinística mesmo re-rodando.
 const EMAIL = `e2e+${Date.now()}@belessence.test`;
+
+// Carrinho é estado compartilhado no banco (mesmo `e2e-user` em todos os
+// specs) e sobrevive a retries e a execuções inteiras. Sem este reset, um
+// spec que morre depois de "adicionar à bag" faz o checkout seguinte levar
+// o item órfão junto e derruba a asserção de estoque. Ver `clearCart`.
+test.beforeEach(async () => {
+  await clearCart(TEST_USER.id);
+});
 
 test.afterAll(async () => {
   await closeDb();

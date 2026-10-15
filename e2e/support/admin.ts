@@ -66,10 +66,23 @@ export async function loginAsAdmin(
  *
  * `stubCloudinary` (abaixo) cobre a assinatura e o POST do upload; este
  * cobre o widget. Os dois são necessários.
+ *
+ * ⚠️ **O padrão é um caminho LOCAL, não uma URL da Cloudinary.** A primeira
+ * versão devolvia `res.cloudinary.com/demo/.../stub.jpg`, que não existe.
+ * O produto criado pelo teste fica no banco compartilhado e reaparece em
+ * "Você Também Vai Amar" das outras páginas; ali o `/_next/image` tenta
+ * buscar esse asset no servidor, a requisição não termina, o evento `load`
+ * nunca dispara e **todo `page.goto` com `waitUntil: "load"` estoura em
+ * 60s** — foi assim que o checkout-flow e o order-tracking quebraram no CI
+ * depois de passarem localmente (em dev a diferença não aparece).
+ *
+ * `/assets/hero1.png` existe no repositório, então resolve na hora. Para o
+ * caminho que este teste exercita — widget → form → Server Action → Prisma
+ * — tanto faz se a string é local ou remota.
  */
 export async function stubCloudinaryWidget(
   page: Page,
-  secureUrl = "https://res.cloudinary.com/demo/image/upload/v1/stub.jpg",
+  secureUrl = "/assets/hero1.png",
 ): Promise<void> {
   await page.route("**/upload-widget.cloudinary.com/**", (route) =>
     route.fulfill({
@@ -119,11 +132,14 @@ export async function stubCloudinary(page: Page): Promise<void> {
       },
     }),
   );
-  // Upload direto ao Cloudinary → devolve uma URL falsa válida
+  // Upload direto ao Cloudinary → devolve um asset que existe de verdade.
+  // Mesmo motivo do `stubCloudinaryWidget`: a URL gravada no produto é
+  // servida depois nas vitrines, e apontar para um arquivo inexistente
+  // pendura o `/_next/image` e, com ele, o `load` da página.
   await page.route("https://api.cloudinary.com/**", (route) =>
     route.fulfill({
       json: {
-        secure_url: "https://res.cloudinary.com/demo/image/upload/v1/stub.jpg",
+        secure_url: "/assets/hero1.png",
         public_id: "belessence/products/stub",
       },
     }),

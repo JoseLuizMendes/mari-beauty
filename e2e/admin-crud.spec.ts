@@ -19,6 +19,11 @@ import { query, closeDb } from "./support/db";
 const SLUG = `e2e-produto-${Date.now()}`;
 
 test.afterAll(async () => {
+  // Remove o produto criado. Sem isto ele fica no banco de teste e aparece
+  // nas vitrines dos outros specs — `fullyParallel` está ligado, então os
+  // specs dividem o mesmo banco ao mesmo tempo. Higiene de quem escreve em
+  // estado compartilhado, não detalhe.
+  await query("DELETE FROM products WHERE slug = $1", [SLUG]);
   await closeDb();
 });
 

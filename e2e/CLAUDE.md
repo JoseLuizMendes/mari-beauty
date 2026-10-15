@@ -65,6 +65,45 @@ Nenhum tinha bug de produto. As causas, para não se repetirem:
    clique falhava, o teste seguia e morria no `toHaveURL` 15s depois. Passo
    de setup que pode falhar deve falhar alto.
 
+5. **Dado que um spec grava vaza para os outros.** Todos os specs
+   dividem o mesmo banco. O `admin-crud` cria um produto; ele reaparece em
+   "Você Também Vai Amar" das vitrines dos outros specs. Enquanto a imagem
+   desse produto foi `res.cloudinary.com/.../stub.jpg` — que não existe — o
+   `/_next/image` tentava buscá-la no servidor e **todo `page.goto` com
+   `waitUntil: "load"` estourava em 60s**. Duas lições: dublê devolve
+   **asset que existe** (hoje `/assets/hero1.png`), e spec que escreve
+   limpa no `afterAll`.
+
+6. **Passar em dev não é passar.** O CI roda `pnpm build && pnpm start`;
+   `pnpm dev` serve imagem e rota por caminhos diferentes. Antes de
+   religar spec que estava skipado, rode uma vez com `CI=true`.
+
+7. **O carrinho é estado compartilhado no banco — e é ele que deixa a
+   suíte flaky.** Esta é a armadilha que sobreviveu a todas as outras, e
+   custou duas rodadas de diagnóstico errado antes de aparecer.
+
+   O carrinho da Belessence é privado por usuário e mora em `cart_items`,
+   **não** em `localStorage` (seção 1 de `src/lib/CLAUDE.md`). Todos os
+   specs logam como o mesmo `e2e-user`. Logo o carrinho atravessa spec,
+   atravessa retry e atravessa execução inteira da suíte.
+
+   O estrago é silencioso: um spec que morre depois de "adicionar à bag" e
+   antes de finalizar deixa o item lá. Na execução seguinte o checkout leva
+   o órfão junto, o estoque cai mais de uma unidade e
+   `expect(stock).toBe(stockBefore - 1)` quebra — exibindo um número tipo
+   `Expected: 47 / Received: 43`, que **acusa o checkout e não o resíduo**.
+   Com `retries: 2` acumula dentro da própria execução: cada tentativa que
+   morre no meio soma um item para a próxima, e o sintoma vira `1 flaky`.
+
+   Por isso `clearCart(TEST_USER.id)` vai em **`beforeEach`**, nunca em
+   `afterAll`: `afterAll` não roda entre as tentativas de retry, que é
+   justamente onde o resíduo nasce. Spec novo que faz checkout entra com
+   esse `beforeEach`.
+
+   > Como verificar de verdade: rode a suíte **duas vezes seguidas sem
+   > limpar o banco entre elas**. Uma execução só, em banco recém-semeado,
+   > passa mesmo com o vazamento — foi assim que ele ficou escondido.
+
 > **Regra:** `test.skip` sem condição só com link de issue e prazo. "A
 > debugar" não é prazo — foi essa nota que manteve três fluxos de receita
 > desligados com o CI verde por omissão.
