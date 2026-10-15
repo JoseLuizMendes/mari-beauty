@@ -6,6 +6,7 @@ import {
   closeDb,
 } from "./support/db";
 import { loginAsUser, TEST_USER } from "./support/auth";
+import { gotoAndReport } from "./support/navigation";
 
 /**
  * E2E — Rastreamento de pedido após pagamento aprovado.
@@ -66,7 +67,7 @@ test("PREPARING: após checkout aprovado, pedido fica em PREPARING e modal mostr
   );
 
   // 1. Adiciona o produto ao carrinho
-  await page.goto(`/product/${SLUG}`);
+  await gotoAndReport(page, `/product/${SLUG}`);
   await page.getByRole("button", { name: /adicionar à bag/i }).click();
   await expect(page.getByText(/seu carrinho/i)).toBeVisible();
 

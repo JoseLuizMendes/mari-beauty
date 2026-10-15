@@ -7,6 +7,7 @@ import {
   closeDb,
 } from "./support/db";
 import { loginAsUser, TEST_USER } from "./support/auth";
+import { gotoAndReport } from "./support/navigation";
 
 /**
  * E2E — Fluxo de checkout completo (regra crítica em BANCO REAL)
@@ -72,7 +73,7 @@ test("checkout cria pedido, baixa estoque e consome cupom", async ({
   expect(stockBefore).toBeGreaterThan(0);
 
   // 1. Adiciona o produto ao carrinho
-  await page.goto(`/product/${SLUG}`);
+  await gotoAndReport(page, `/product/${SLUG}`);
   await page.getByRole("button", { name: /adicionar à bag/i }).click();
   await expect(page.getByText(/seu carrinho/i)).toBeVisible();
 
