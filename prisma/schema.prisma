@@ -348,3 +348,27 @@ model AdminLoginAttempt {
 
   @@map("admin_login_attempts")
 }
+
+/// Contador de rate limit compartilhado entre instâncias.
+///
+/// Existe porque o store em memória não funciona em serverless: cada
+/// instância tem o seu `Map`, e quem ataca com concorrência cai em
+/// instâncias diferentes e passa por baixo do limite. O Postgres é a
+/// memória que todas compartilham — mesma escolha que `AdminLoginAttempt`
+/// já fazia para o login admin.
+///
+/// Janela fixa, não deslizante: `windowStart` marca o início da janela
+/// corrente e `count` é quanto já entrou nela. O erro de borda (até 2x o
+/// limite na virada) é aceitável para o que se barra aqui, e em troca o
+/// registro é uma linha por chave, atualizada por um único `INSERT ... ON
+/// CONFLICT` — atômico sob concorrência, sem transação explícita.
+model RateLimitWindow {
+  /// `<regra>:<cliente>` — ex.: `couponValidate:203.0.113.7`.
+  key         String   @id
+  count       Int      @default(0)
+  windowStart DateTime
+
+  /// Serve só à limpeza das janelas vencidas.
+  @@index([windowStart])
+  @@map("rate_limit_windows")
+}
