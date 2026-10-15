@@ -24,6 +24,25 @@ import { AdminMobileNav } from "@/components/admin/admin-mobile-nav";
 import { Button } from "@/components/ui/button";
 import { ADMIN_COOKIE } from "@/lib/auth/presentation/admin-auth";
 
+/**
+ * Todo o admin é dinâmico, e o build não depende do banco.
+ * ─────────────────────────────────────────────────────────────────────
+ * Motivo (auditoria 2026-10, §8.6): sem isto o Next prerenderiza as
+ * páginas do admin, que consultam o Prisma. `pnpm build` passava a exigir
+ * Postgres de pé e falhava com ECONNREFUSED offline. Na Vercel funcionava
+ * por acidente — o Neon está acessível no build —, então o acoplamento
+ * não aparecia onde dói.
+ *
+ * Prerenderizar aqui nunca fez sentido: cada página destas é **privada,
+ * autenticada e sempre fresca**. Pedido, estoque e mensagem prerenderizados
+ * seriam dados velhos servidos a quem precisa dos de agora.
+ *
+ * Declarado no layout do grupo, não página a página: vale para as sete
+ * rotas filhas, e rota nova entra já dinâmica em vez de depender de
+ * alguém lembrar da linha.
+ */
+export const dynamic = "force-dynamic";
+
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/produtos", label: "Produtos", icon: Package, exact: false },
@@ -122,7 +141,10 @@ export default function AdminLayout({
           <SidebarContent />
         </AdminMobileNav>
 
-        <Link href="/admin" className="flex items-center gap-2 focus-ring rounded-sm">
+        <Link
+          href="/admin"
+          className="flex items-center gap-2 focus-ring rounded-sm"
+        >
           <MariLogo className="h-6 w-9 text-brand-pink" />
           <span className="text-[11px] tracking-[0.32em] uppercase font-medium">
             Admin

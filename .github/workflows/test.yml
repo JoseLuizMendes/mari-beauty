@@ -68,6 +68,13 @@ jobs:
       ADMIN_SECRET: e2e-admin-secret-fixo-para-ci
       # Mesmo segredo lido pelo app (Auth.js) e pelo loginAsUser (forja o JWT).
       AUTH_SECRET: e2e-auth-secret-fixo-para-ci
+      # Valores de fachada, não credenciais: o CloudinaryUpload esconde o
+      # widget inteiro quando cloudName/apiKey faltam (`missingConfig`), e aí
+      # o admin-crud não tem como anexar imagem e o form nunca envia. O upload
+      # de verdade nunca acontece — `stubCloudinaryWidget` dubla o script.
+      # Precisam existir no BUILD: NEXT_PUBLIC_* é inlinado no bundle.
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: demo
+      NEXT_PUBLIC_CLOUDINARY_API_KEY: "000000000000000"
       NODE_ENV: test
     steps:
       - uses: actions/checkout@v5

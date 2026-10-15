@@ -1,6 +1,13 @@
 import { test, expect } from "@playwright/test";
-import { getOrderStatus, getOrderEvents, closeDb } from "./support/db";
-import { loginAsUser } from "./support/auth";
+import {
+  getOrderStatus,
+  getOrderEvents,
+  clearCart,
+  closeDb,
+} from "./support/db";
+import { loginAsUser, TEST_USER } from "./support/auth";
+import { gotoAndReport } from "./support/navigation";
+import { blockImages } from "./support/network";
 
 /**
  * E2E — Rastreamento de pedido após pagamento aprovado.
@@ -28,15 +35,21 @@ import { loginAsUser } from "./support/auth";
 const SLUG = "midnight-velvet";
 const EMAIL = `e2e-tracking+${Date.now()}@belessence.test`;
 
+// Carrinho é estado compartilhado no banco (mesmo `e2e-user` em todos os
+// specs) e sobrevive a retries e a execuções inteiras. Sem este reset, um
+// spec que morre depois de "adicionar à bag" faz o checkout seguinte levar
+// o item órfão junto e derruba a asserção de estoque. Ver `clearCart`.
+test.beforeEach(async ({ page }) => {
+  await clearCart(TEST_USER.id);
+  // Sem isto o `load` do PDP não dispara no CI — ver `blockImages`.
+  await blockImages(page);
+});
+
 test.afterAll(async () => {
   await closeDb();
 });
 
-// Após Rodada Auth: checkout exige login (auth() redireciona pra /entrar).
-// Spec completo precisa do mesmo helper loginAsUser (T-extra-4) que o
-// `checkout-flow.spec.ts` aguarda — quando ele chegar, basta remover o
-// `.skip` (deixar como `test(...)`).
-test.skip("PREPARING: após checkout aprovado, pedido fica em PREPARING e modal mostra etapas com datas reais — a debugar (login OK)", async ({
+test("PREPARING: após checkout aprovado, pedido fica em PREPARING e modal mostra etapas com datas reais", async ({
   page,
   context,
 }) => {
@@ -57,7 +70,7 @@ test.skip("PREPARING: após checkout aprovado, pedido fica em PREPARING e modal 
   );
 
   // 1. Adiciona o produto ao carrinho
-  await page.goto(`/product/${SLUG}`);
+  await gotoAndReport(page, `/product/${SLUG}`);
   await page.getByRole("button", { name: /adicionar à bag/i }).click();
   await expect(page.getByText(/seu carrinho/i)).toBeVisible();
 
@@ -117,13 +130,20 @@ test.skip("PREPARING: após checkout aprovado, pedido fica em PREPARING e modal 
   expect(t1).toBeGreaterThanOrEqual(t0);
 
   // 10. Abre o modal de rastreamento e valida as 3 etapas concluídas
+  //
+  // ⚠️ Buscar na página inteira dá conflito de modo estrito: "Em
+  // Separação" aparece duas vezes — no selo de status do pedido e na
+  // etapa da linha do tempo. São elementos diferentes dizendo a mesma
+  // coisa, e só o segundo é o que este teste afirma. Escopar no diálogo
+  // resolve e deixa explícito o que se está checando.
   await page.getByRole("button", { name: /rastrear pedido/i }).click();
+  const modal = page.getByRole("dialog");
   await expect(
-    page.getByRole("heading", { name: /rastreamento/i }),
+    modal.getByRole("heading", { name: /rastreamento/i }),
   ).toBeVisible();
-  await expect(page.getByText(/Pedido Recebido/i)).toBeVisible();
-  await expect(page.getByText(/Pagamento Confirmado/i)).toBeVisible();
-  await expect(page.getByText(/Em Separação/i)).toBeVisible();
+  await expect(modal.getByText(/Pedido Recebido/i)).toBeVisible();
+  await expect(modal.getByText(/Pagamento Confirmado/i)).toBeVisible();
+  await expect(modal.getByText(/Em Separação/i)).toBeVisible();
 });
 
 test("PREPARING idempotência (skip — coberta em unit)", async () => {

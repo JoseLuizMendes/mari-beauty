@@ -31,7 +31,7 @@ export async function query<T = Record<string, unknown>>(
 /** Estoque atual de um produto pelo slug. */
 export async function getStockBySlug(slug: string): Promise<number> {
   const rows = await query<{ stock: number }>(
-    'SELECT stock FROM products WHERE slug = $1',
+    "SELECT stock FROM products WHERE slug = $1",
     [slug],
   );
   return rows[0]?.stock ?? -1;
@@ -58,7 +58,7 @@ export async function countOrdersByEmail(email: string): Promise<number> {
 /** Status atual de um pedido por id. */
 export async function getOrderStatus(orderId: string): Promise<string | null> {
   const rows = await query<{ status: string }>(
-    'SELECT status FROM orders WHERE id = $1',
+    "SELECT status FROM orders WHERE id = $1",
     [orderId],
   );
   return rows[0]?.status ?? null;
@@ -73,7 +73,9 @@ export interface OrderEventRow {
 }
 
 /** Lista os eventos de um pedido em ordem cronológica ascendente. */
-export async function getOrderEvents(orderId: string): Promise<OrderEventRow[]> {
+export async function getOrderEvents(
+  orderId: string,
+): Promise<OrderEventRow[]> {
   const rows = await query<{
     id: string;
     status: string;
@@ -84,6 +86,33 @@ export async function getOrderEvents(orderId: string): Promise<OrderEventRow[]> 
     [orderId],
   );
   return rows;
+}
+
+/**
+ * Zera o carrinho de um usuário.
+ * ─────────────────────────────────────────────────────────────────────
+ * **Pré-requisito de todo spec que faz checkout**, não higiene opcional.
+ *
+ * O carrinho da Belessence é privado por usuário e mora no banco
+ * (`cart_items`), não em `localStorage` — ver a nota na seção 1 de
+ * `src/lib/CLAUDE.md`. Como todos os specs logam como o mesmo `e2e-user`,
+ * o carrinho é estado **compartilhado e persistente** entre specs, entre
+ * retries e entre execuções inteiras da suíte.
+ *
+ * O estrago: um spec que morre depois de "adicionar à bag" e antes de
+ * finalizar deixa o item lá. Na execução seguinte o checkout leva aquele
+ * item junto, o estoque cai mais de uma unidade e
+ * `expect(stock).toBe(stockBefore - 1)` quebra — num teste que não tem
+ * nada de errado. Com `retries: 2` o efeito se acumula dentro da própria
+ * execução: cada tentativa que falha no meio soma mais um item para a
+ * próxima.
+ *
+ * Por isso a limpeza vai em `beforeEach`, e não em `afterAll`: `afterAll`
+ * não roda entre as tentativas de retry, que é exatamente onde o resíduo
+ * nasce.
+ */
+export async function clearCart(userId: string): Promise<void> {
+  await query('DELETE FROM cart_items WHERE "userId" = $1', [userId]);
 }
 
 export async function closeDb(): Promise<void> {
