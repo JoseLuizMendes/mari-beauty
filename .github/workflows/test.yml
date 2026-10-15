@@ -62,7 +62,10 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql://belessence:belessence@localhost:5432/belessence_test
-      ADMIN_SECRET: e2e-secret
+      # >=16 chars: o schema de env valida o tamanho, porque ADMIN_SECRET e
+      # chave de assinatura HS256, nao um identificador. Valor curto aqui
+      # derrubava o boot e, com ele, o e2e inteiro.
+      ADMIN_SECRET: e2e-admin-secret-fixo-para-ci
       # Mesmo segredo lido pelo app (Auth.js) e pelo loginAsUser (forja o JWT).
       AUTH_SECRET: e2e-auth-secret-fixo-para-ci
       NODE_ENV: test
