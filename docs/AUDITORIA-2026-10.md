@@ -455,6 +455,59 @@ de design system**.
 
 ---
 
+## 8.6 Achados da sessão de 2026-10-15 (PRs #15 a #18)
+
+Coisas que só apareceram ao mexer no código. Nenhuma estava na auditoria
+original.
+
+### 🟠 Rate limit distribuído — pendente, bloqueia produção
+
+O PR #17 pôs rate limit nas cinco rotas públicas, mas com **store em
+memória**. Em serverless cada instância tem o próprio `Map`, então ataque
+com concorrência contorna. Reduz flood acidental; não detém atacante.
+
+O certo é contador no Postgres, como `admin-login.ts` já faz com
+`AdminLoginAttempt`. Exige migration — não feita porque o Docker não estava
+disponível para gerar e testar, e migration não testada é pior que o
+problema. O store é uma interface (`RateLimitStore`), então é adicionar um
+arquivo, não reescrever call sites.
+
+### 🟠 `pnpm build` exige banco acessível
+
+As páginas `/admin/*` são prerenderizadas e consultam o Prisma no build, que
+falha com `ECONNREFUSED` sem Postgres de pé. Na Vercel funciona (Neon
+acessível), mas impede build local offline e deixa o build acoplado à
+disponibilidade do banco.
+
+Provável correção: `export const dynamic = "force-dynamic"` nas páginas do
+admin — elas são por definição dinâmicas e autenticadas, não deveriam ser
+prerenderizadas.
+
+### 🟡 O drift de doc era maior que os 36 caminhos
+
+Além dos caminhos mortos, havia afirmações erradas em prosa que o guard de
+caminhos não pega:
+
+- `src/lib/CLAUDE.md` descrevia a estrutura **plana** inteira
+  (`prisma.ts`, `products-db.ts`, `validations.ts`…) que o refactor
+  hexagonal eliminou. Passou pelo teste porque nomes sem `/` não são
+  tratados como caminho. Reescrito no #15.
+- `components/CLAUDE.md` dizia que a paleta era *"OKLCH (ivory + champagne
+  gold + noir)"*. É hex, e é wine / rosé / marfim. Corrigido no #17.
+
+Lição de método: **find/replace cego em documentação destrói história.** A
+primeira versão do #15 reescreveu notas de migração até elas dizerem
+"X → X", apagando o registro de onde cada arquivo veio. O guard ganhou
+marcadores de histórico e de roadmap para não forçar esse tipo de reescrita.
+
+### 🟡 O fixture de `ADMIN_SECRET` no CI era fraco
+
+O workflow usava `e2e-secret` — 11 caracteres para uma chave de assinatura
+HS256. A validação de env (#16) rejeitou, e com razão. Valor reforçado no
+workflow em vez de afrouxar a regra.
+
+---
+
 ## 9. Quality Gate desta auditoria
 
 - [x] Código-fonte lido diretamente (não inferido de documentação)

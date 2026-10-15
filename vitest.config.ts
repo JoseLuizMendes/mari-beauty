@@ -31,6 +31,14 @@ export default defineConfig({
         // redundante com o runProbe do use case. Unit cobre a orquestração.
         "src/lib/health/infrastructure/persistence/database-health.ts",
         "src/lib/motion/**", // GSAP helpers — efeito visual, sem assert significativo
+        // Camada de render WebGL (react-three-fiber). jsdom não tem contexto
+        // WebGL, então nada aqui EXECUTA em teste unitário — cobri-la seria
+        // falsificar a métrica. A lógica testável do frasco mora em
+        // `src/lib/design/domain/bottle-profile.ts`, que é aritmética pura e
+        // tem 17 testes. Mesmo critério já aplicado a src/lib/motion.
+        "src/components/bottle-3d/**",
+        // Rota de laboratório: existe só em dev (404 em produção).
+        "src/app/lab/**",
         "src/components/admin/cloudinary-upload.tsx",
         // Auth.js v5 config + Arctic OAuth — wiring declarativo, sem lógica
         // testável em unit (fluxo coberto por E2E + smoke real OAuth).

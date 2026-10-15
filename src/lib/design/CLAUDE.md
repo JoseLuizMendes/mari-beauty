@@ -22,10 +22,9 @@ escopo: "Bounded context Design — tokens visuais (OKLCH palette, tipografia, e
 
 ## 1. Escopo
 
-- Paleta OKLCH (Preto, Dourado, Champagne)
-- Tipografia (Playfair Display + Inter)
-- Espaçamento / sizing
-- Helpers de design (resolveOKLCH, etc)
+- Paleta Mari Beauty em **hex**: wine `#47131C`, rosé `#FFD7E7`, marfim `#FFFDE9`
+- Tipografia, espaçamento, sizing
+- Perfil paramétrico do frasco 3D (`bottle-profile.ts`)
 
 Tudo o que descreve **como o produto Mari Beauty parece** vive aqui. Mudanças aqui afetam TODO o sistema visual.
 
@@ -36,7 +35,8 @@ Tudo o que descreve **como o produto Mari Beauty parece** vive aqui. Mudanças a
 ```
 src/lib/design/
 ├── domain/
-│   └── tokens.ts          # ex-`src/lib/design-tokens.ts`
+│   ├── tokens.ts           # ex-`src/lib/design-tokens.ts`
+│   └── bottle-profile.ts   # frasco 3D como dado — spec 001
 └── CLAUDE.md
 ```
 
@@ -60,7 +60,8 @@ Sem `application/`/`infrastructure/`/`presentation/`: design tokens não têm re
 
 ## 5. Testes
 
-Sem suite dedicada hoje — tokens são valores literais; testes seriam tautológicos. Auditoria visual é via Lighthouse + WCAG check.
+- `tokens.ts`: sem suite dedicada — valores literais, testes seriam tautológicos.
+- `bottle-profile.ts`: `src/test/bottle-profile.test.ts` cobre as invariantes de geometria (líquido dentro da cavidade, tampa no topo, raio limitado).
 
 ---
 

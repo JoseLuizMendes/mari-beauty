@@ -24,7 +24,8 @@ escopo: "Camada Domain do bounded context design — tokens visuais puros"
 
 ## Conteúdo
 
-- `tokens.ts` — paleta OKLCH + tipografia + spacing + helpers.
+- `tokens.ts` — paleta (hex) + tipografia + spacing + helpers.
+- `bottle-profile.ts` — perfil paramétrico do frasco 3D: tipos, perfil padrão derivado de `public/assets/hero1.png`, e as funções puras que derivam silhueta, volume de líquido e tampa. **Sem Three.js aqui** — quem vira malha é `src/components/bottle-3d/`.
 
 ## Stack Local
 
@@ -32,7 +33,8 @@ TypeScript puro.
 
 ## Testes
 
-Sem suite dedicada — valores literais.
+- `src/test/bottle-profile.test.ts` — invariantes do frasco.
+- `tokens.ts` não tem suite: são valores literais.
 
 ## Referências
 

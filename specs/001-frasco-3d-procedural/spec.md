@@ -146,6 +146,48 @@ animação nem é GSAP — é `useFrame`.
 A fatia 1 é um spike: código descartável, serve para responder "parece vidro de
 verdade?" antes de investir nas outras quatro.
 
+## 8.1 O que a fatia 1 aprendeu (2026-10-15)
+
+Spike implementado em `/lab/bottle`. Resultado honesto: **a abordagem
+funciona e a geometria está certa; o acabamento ainda não é fotorrealista.**
+
+### Três armadilhas que custaram tempo e que ficam registradas
+
+**1. `transmission` só refrata o que está DENTRO da cena WebGL.**
+A primeira versão usava canvas `alpha: true` com o fundo vindo de uma div
+CSS. O vidro refratava o vazio e renderizava como a própria cor — um
+retângulo verde-menta chapado, sem transparência nenhuma. A correção foi
+`SceneBackdrop`: um plano com degradê dentro da cena. É o mesmo motivo pelo
+qual o soda-landingpage define `environment-image` no `<model-viewer>`.
+
+**2. Transmissão dentro de transmissão não funciona.**
+O líquido começou com `transmission: 0.6`. O buffer que o Three usa para
+refratar **não inclui outros objetos transmissivos**, então o líquido sumia
+da refração do vidro. O líquido virou `meshStandardMaterial` opaco com
+`envMapIntensity` alto — aparece através do vidro e ainda pega o ambiente.
+
+**3. De frente, um prisma retangular lê como retângulo.**
+Com a câmera em `[0, 0, 3.2]` não havia nenhuma pista de profundidade. A
+câmera em 3/4 (`[1.15, 0.35, 2.9]`) resolve, porque mostra a espessura do
+vidro na quina.
+
+> Armadilha de método, não de código: a primeira avaliação foi feita com a
+> foto de referência a 35% atrás do canvas. Parecia ótimo — a foto estava
+> fornecendo todo o interesse visual. **Julgar o render sempre com a
+> referência desligada.**
+
+### O que ainda falta para parecer foto
+
+- Líquido sem gradiente interno nem menisco; lê como bloco de cor.
+- Sem sombra de contato — o frasco flutua.
+- Quinas de vidro sem o "bastão sólido" que vidro grosso produz.
+- `Environment` com Lightformers dá especular, mas não a riqueza de um HDR.
+
+Nada disso é bloqueio de arquitetura: é direção de arte sobre uma base que
+já funciona. A fatia 2 continua válida como estava.
+
+---
+
 ## 9. Riscos
 
 | Risco                               | Mitigação                                                                                                            |
