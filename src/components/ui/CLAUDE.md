@@ -42,7 +42,7 @@ Duas categorias:
 
 - **`cn()` helper**: importado de `@/shadcn-utils/utils` (peculiaridade do
   alias do projeto — `components.json` aponta `utils → @/shadcn-utils/utils`).
-  Antes do rename de 2026-05-30 era `@/shadcn-utils/utils`.
+  Antes do rename de 2026-05-30 era `@/api/utils`.
 - **`cva`** (`class-variance-authority`) para variants. Padrão:
   ```ts
   const buttonVariants = cva("base classes", {

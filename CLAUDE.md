@@ -128,10 +128,14 @@ O schema tem dois níveis:
 - **Nunca confiar em preço, estoque ou cupom vindo do client.** Re-validar
   no servidor via Prisma (ver `src/app/api/checkout/route.ts`).
 - Toda entrada externa passa por **Zod** (`src/lib/shared/domain/zod-schemas.ts`).
-- Rate limit hoje existe **só no login admin**
-  (`src/lib/auth/infrastructure/persistence/admin-login.ts`). As rotas públicas
-  (`/api/contact`, `/api/newsletter`, `/api/reviews`, `/api/coupon/validate`,
-  `/api/cep/[cep]`) estão sem — ver Onda 0 da auditoria.
+- **Rota pública nova entra com rate limit e, se for formulário, honeypot.**
+  - Limites em `src/lib/shared/infrastructure/rate-limit.ts`; aplicar com
+    `enforceRateLimit(req, "<regra>")` na primeira linha do handler.
+  - Honeypot: `src/components/ui/honeypot-field.tsx` no form + checagem de
+    `HONEYPOT_FIELD_NAME` no handler, respondendo **sucesso falso**.
+  - ⚠️ O store do rate limit é **em memória**: em serverless cada instância
+    tem o seu, então reduz flood mas não detém atacante determinado. O
+    upgrade é um store em Postgres, como `admin-login.ts` já faz.
 
 ### 6.3 Performance
 

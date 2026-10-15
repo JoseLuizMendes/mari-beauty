@@ -12,8 +12,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/shared/infrastructure/prisma-client";
 import { reviewSchema } from "@/lib/shared/domain/zod-schemas";
+import { enforceRateLimit } from "@/lib/shared/infrastructure/with-rate-limit";
 
 export async function POST(req: NextRequest) {
+  const blocked = await enforceRateLimit(req, "reviews");
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
     const parsed = reviewSchema.safeParse(body);

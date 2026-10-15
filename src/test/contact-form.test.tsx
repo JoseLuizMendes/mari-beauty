@@ -31,7 +31,11 @@ async function fillValid(user: User) {
   await fillField(user, /^nome$/i, "Ana Silva");
   await fillField(user, /^email$/i, "ana@example.com");
   await fillField(user, /^assunto$/i, "Dúvida");
-  await fillField(user, /^mensagem$/i, "Gostaria de saber mais sobre o produto X.");
+  await fillField(
+    user,
+    /^mensagem$/i,
+    "Gostaria de saber mais sobre o produto X.",
+  );
 }
 
 function submit(user: User) {
@@ -76,7 +80,11 @@ describe("ContactForm", () => {
     await fillField(user, /^nome$/i, "Ana");
     await fillField(user, /^email$/i, "naoeumemail");
     await fillField(user, /^assunto$/i, "Olá");
-    await fillField(user, /^mensagem$/i, "Mensagem com pelo menos 10 caracteres");
+    await fillField(
+      user,
+      /^mensagem$/i,
+      "Mensagem com pelo menos 10 caracteres",
+    );
     await submit(user);
 
     await waitFor(() => {
@@ -111,7 +119,24 @@ describe("ContactForm", () => {
       email: "ana@example.com",
       subject: "Dúvida",
       message: "Gostaria de saber mais sobre o produto X.",
+      // Honeypot vai junto, vazio: é assim que o servidor distingue humano
+      // de bot. Se este campo sumir do corpo, a armadilha deixa de existir
+      // sem nada quebrar — por isso a asserção é exata, não parcial.
+      website: "",
     });
+  });
+
+  it("renderiza o honeypot escondido e fora da ordem de tabulação", () => {
+    render(<ContactForm />);
+
+    const honeypot = document.querySelector<HTMLInputElement>("#hp-website");
+    expect(honeypot).not.toBeNull();
+    expect(honeypot!.tabIndex).toBe(-1);
+    expect(honeypot!.getAttribute("autocomplete")).toBe("off");
+    // Precisa estar escondido por posicionamento, não por display:none —
+    // bot que presta atenção pula display:none e type=hidden.
+    expect(honeypot!.closest("[aria-hidden='true']")).not.toBeNull();
+    expect(honeypot!.type).toBe("text");
   });
 
   it("mostra toast de erro quando API retorna !ok", async () => {

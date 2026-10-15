@@ -11,8 +11,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateCoupon } from "@/lib/coupons/infrastructure/persistence/coupons-repository";
 import { couponValidateSchema } from "@/lib/shared/domain/zod-schemas";
+import { enforceRateLimit } from "@/lib/shared/infrastructure/with-rate-limit";
 
 export async function POST(req: NextRequest) {
+  const blocked = await enforceRateLimit(req, "couponValidate");
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
     const parsed = couponValidateSchema.safeParse(body);

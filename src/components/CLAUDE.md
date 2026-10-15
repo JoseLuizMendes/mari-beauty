@@ -40,8 +40,9 @@ Padrão de composição: **Server faz fetch e passa dados como prop** para um
    - variáveis CSS em `src/app/globals.css`. **Nunca usar cor/espaçamento
      hardcoded.** Use Tailwind tokens (`bg-primary`, `text-foreground`,
      `border-border`) ou as classes oficiais do design system.
-2. **Paleta** é OKLCH (ivory + champagne gold + noir). Hex está banido
-   em código novo.
+2. **Paleta** é a Mari Beauty: wine (`#47131C`), rosé (`#FFD7E7`) e
+   marfim (`#FFFDE9`), definida em `src/app/globals.css`. Os valores são
+   **hex**, não OKLCH. Nunca hardcodar — use os tokens.
 3. **Tipografia**: Poppins (sans, em uso atualmente no `layout.tsx`).
    Playfair foi mencionada no design — verifique tokens antes de aplicar.
 4. **Espaçamento**: respeitar a escala do Tailwind v4 (4px grid). Evitar

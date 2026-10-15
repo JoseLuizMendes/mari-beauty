@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { vi } from "vitest";
+import { beforeEach, vi } from "vitest";
 
 // jsdom não implementa window.matchMedia. Componentes que verificam
 // prefers-reduced-motion (Newsletter, etc.) precisam dele.
@@ -49,10 +49,7 @@ if (typeof globalThis.ResizeObserver === "undefined") {
 }
 
 // jsdom não implementa scrollIntoView no Element.prototype.
-if (
-  typeof window !== "undefined" &&
-  !Element.prototype.scrollIntoView
-) {
+if (typeof window !== "undefined" && !Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = function () {};
 }
 
@@ -145,7 +142,8 @@ vi.mock("@/lib/shared/infrastructure/prisma-client", () => ({
     $transaction: vi.fn(async (arg: unknown) => {
       // Suporta tanto array de promises quanto callback(tx)
       if (Array.isArray(arg)) return Promise.all(arg);
-      if (typeof arg === "function") return (arg as (tx: unknown) => unknown)({});
+      if (typeof arg === "function")
+        return (arg as (tx: unknown) => unknown)({});
       return arg;
     }),
   },
@@ -198,7 +196,9 @@ vi.mock("@gsap/react", () => ({
 // comportamento. Testes que precisam do estado deslogado podem sobrescrever.
 vi.mock("next-auth/react", () => ({
   useSession: () => ({
-    data: { user: { id: "test-user", name: "Test", email: "test@belessence.dev" } },
+    data: {
+      user: { id: "test-user", name: "Test", email: "test@belessence.dev" },
+    },
     status: "authenticated",
   }),
   signIn: vi.fn(),
@@ -237,3 +237,14 @@ vi.mock("lenis", () => ({
     destroy: vi.fn(),
   })),
 }));
+
+// O rate limit das rotas públicas guarda contagem num store em memória no
+// escopo do módulo. Sem zerar entre casos, um arquivo de teste que chama o
+// mesmo handler mais vezes que o limite faz os últimos casos receberem 429 —
+// e o teste quebra por ordem de execução, não por comportamento.
+// Ver src/lib/shared/infrastructure/rate-limit.ts
+beforeEach(async () => {
+  const { resetDefaultStore } =
+    await import("@/lib/shared/infrastructure/rate-limit");
+  resetDefaultStore();
+});
