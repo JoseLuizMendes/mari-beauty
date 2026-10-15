@@ -1,7 +1,7 @@
 /**
  * Helper de imagem de produto.
  * ─────────────────────────────────────────────────────────────────────
- * Aceita tanto caminhos locais (`/assets/Perf1.jpg`) quanto URLs absolutas
+ * Aceita tanto caminhos locais (`/assets-removebg/Perf1.png`) quanto URLs absolutas
  * (Cloudinary, etc.). Para URLs Cloudinary, anexa `f_auto,q_auto` na URL
  * se ainda não houver transformações, garantindo formato e qualidade
  * otimizados automaticamente.

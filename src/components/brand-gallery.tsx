@@ -19,15 +19,46 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Mapeamento das 7 imagens + legenda editorial
+/**
+ * Os frascos da galeria.
+ *
+ * ⚠️ Até 2026-10-15 esta lista apontava para sete arquivos JPG soltos em
+ * assets/ que **não existem**. Não chegou a quebrar tela porque este
+ * componente não é montado em lugar nenhum — só o teste o importa (ver
+ * nota no fim deste bloco). Os arquivos reais são PNG com fundo removido,
+ * em `/assets-removebg/`. Nada verificava referência de asset; agora
+ * `src/test/asset-refs.test.ts` verifica.
+ *
+ * ⚠️ **Componente órfão.** Nenhuma página importa `BrandGallery`: a home
+ * monta Hero, ParallaxStage, Features, TabbedProducts, MediaMosaic,
+ * FeatureProducts, Testimonials e Newsletter, e nenhuma outra rota o usa.
+ * Ou ele entra numa página, ou sai do repositório — ficar testado e não
+ * renderizado é o pior dos dois mundos: custa manutenção e não entrega
+ * nada. Não removi aqui porque é decisão de produto, não de limpeza.
+ *
+ * São seis, não sete: não existe `Perf6` em lugar nenhum do repositório. A
+ * legenda órfã ("Vetiver & Musc") saiu junto, e os números foram corridos.
+ * Chegando o arquivo, a entrada volta.
+ */
 const SLIDES = [
-  { src: "/assets/Perf1.jpg", caption: "Essência Inaugural", label: "01" },
-  { src: "/assets/Perf2.jpg", caption: "Notas de Ambar",    label: "02" },
-  { src: "/assets/Perf3.jpg", caption: "Silagem Prolongada", label: "03" },
-  { src: "/assets/Perf4.jpg", caption: "Coração de Rosa",   label: "04" },
-  { src: "/assets/Perf5.jpg", caption: "Acorde Boisé",      label: "05" },
-  { src: "/assets/Perf6.jpg", caption: "Vetiver & Musc",    label: "06" },
-  { src: "/assets/Perf7.jpg", caption: "Accord Ultime",     label: "07" },
+  {
+    src: "/assets-removebg/Perf1.png",
+    caption: "Essência Inaugural",
+    label: "01",
+  },
+  { src: "/assets-removebg/Perf2.png", caption: "Notas de Ambar", label: "02" },
+  {
+    src: "/assets-removebg/Perf3.png",
+    caption: "Silagem Prolongada",
+    label: "03",
+  },
+  {
+    src: "/assets-removebg/Perf4.png",
+    caption: "Coração de Rosa",
+    label: "04",
+  },
+  { src: "/assets-removebg/Perf5.png", caption: "Acorde Boisé", label: "05" },
+  { src: "/assets-removebg/Perf7.png", caption: "Accord Ultime", label: "06" },
 ];
 
 export default function BrandGallery() {
@@ -36,7 +67,13 @@ export default function BrandGallery() {
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: "start", dragFree: false },
-    [Autoplay({ delay: 4200, stopOnInteraction: true, stopOnMouseEnter: true })],
+    [
+      Autoplay({
+        delay: 4200,
+        stopOnInteraction: true,
+        stopOnMouseEnter: true,
+      }),
+    ],
   );
 
   // Navegação manual
@@ -60,22 +97,27 @@ export default function BrandGallery() {
   }, [emblaApi]);
 
   // Entrada scroll — heading fade-up
-  useGSAP(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced || !headingRef.current) return;
+  useGSAP(
+    () => {
+      const reduced = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      if (reduced || !headingRef.current) return;
 
-    gsap.from(headingRef.current.children, {
-      opacity: 0,
-      y: 24,
-      duration: 0.8,
-      stagger: 0.12,
-      ease: "power4.out",
-      scrollTrigger: {
-        trigger: headingRef.current,
-        start: "top 85%",
-      },
-    });
-  }, { scope: sectionRef });
+      gsap.from(headingRef.current.children, {
+        opacity: 0,
+        y: 24,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: headingRef.current,
+          start: "top 85%",
+        },
+      });
+    },
+    { scope: sectionRef },
+  );
 
   return (
     <section
@@ -84,7 +126,10 @@ export default function BrandGallery() {
       className="bg-surface-base py-20 md:py-28"
     >
       {/* Cabeçalho editorial */}
-      <div ref={headingRef} className="container-belessence mb-10 md:mb-14 flex items-end justify-between">
+      <div
+        ref={headingRef}
+        className="container-belessence mb-10 md:mb-14 flex items-end justify-between"
+      >
         <div>
           <p className="eyebrow mb-3 text-brand-gold">Campanha 2026</p>
           <h2 className="display-title text-ink-strong text-[clamp(1.75rem,4vw,3rem)]">
@@ -148,7 +193,9 @@ export default function BrandGallery() {
 
               {/* Número do slide abaixo — sempre visível */}
               <div className="absolute top-4 right-4 flex h-7 w-7 items-center justify-center rounded-full bg-surface-base/80 backdrop-blur-sm">
-                <span className="eyebrow text-[9px] text-ink-soft">{slide.label}</span>
+                <span className="eyebrow text-[9px] text-ink-soft">
+                  {slide.label}
+                </span>
               </div>
             </div>
           ))}

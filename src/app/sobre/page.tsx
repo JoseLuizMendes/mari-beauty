@@ -3,6 +3,7 @@
  */
 
 import Link from "next/link";
+import Image from "next/image";
 import { Sparkles, Leaf, Heart, Award } from "lucide-react";
 
 export const metadata = {
@@ -69,12 +70,12 @@ export default function SobrePage() {
             <div className="space-y-5 text-ink-soft leading-relaxed text-[15px]">
               <p>
                 Tudo começou em 2023, num apartamento pequeno em São Paulo,
-                quando Mari decidiu transformar a coleção pessoal de
-                fragrâncias artesanais que vinha cultivando há anos numa marca
-                aberta para outras mulheres. O primeiro perfume — uma
-                composição de jasmim, baunilha e cedro — foi engarrafado à mão,
-                rotulado com etiquetas impressas em casa e enviado para vinte
-                amigas. Em três semanas, todas voltaram pedindo mais.
+                quando Mari decidiu transformar a coleção pessoal de fragrâncias
+                artesanais que vinha cultivando há anos numa marca aberta para
+                outras mulheres. O primeiro perfume — uma composição de jasmim,
+                baunilha e cedro — foi engarrafado à mão, rotulado com etiquetas
+                impressas em casa e enviado para vinte amigas. Em três semanas,
+                todas voltaram pedindo mais.
               </p>
               <p>
                 O que era um experimento virou ofício. Mari estudou perfumaria
@@ -86,11 +87,11 @@ export default function SobrePage() {
                 frasco final.
               </p>
               <p>
-                Hoje, Mari Beauty atende mulheres em todo o Brasil, mas mantém
-                o mesmo cuidado do primeiro lote: produção em pequena escala,
+                Hoje, Mari Beauty atende mulheres em todo o Brasil, mas mantém o
+                mesmo cuidado do primeiro lote: produção em pequena escala,
                 relacionamento próximo com cada cliente e a recusa absoluta de
-                lançar qualquer produto que não passe primeiro pela aprovação
-                de uma única pessoa — a própria Mari.
+                lançar qualquer produto que não passe primeiro pela aprovação de
+                uma única pessoa — a própria Mari.
               </p>
             </div>
           </div>
@@ -134,12 +135,23 @@ export default function SobrePage() {
       <section className="py-16 sm:py-20 border-t border-border-subtle">
         <div className="max-w-5xl mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="aspect-[4/5] rounded-token-md overflow-hidden bg-brand-pink/40">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/assets/newsletter-woman.jpg"
-                alt="Mari, fundadora da Mari Beauty"
-                className="w-full h-full object-cover"
+            {/*
+              Apontava para um JPG de fundadora que não existe no
+              repositório — servia 404 nesta seção.
+
+              O substituto é produto, não pessoa, **de propósito**: as únicas
+              fotos de rosto disponíveis são geradas, e rosto gerado sob a
+              legenda "Mari — fundadora" apresenta uma desconhecida como uma
+              pessoa real e nomeada. Chegando a foto da Mari, troque o `src` e
+              o `alt` aqui.
+            */}
+            <div className="relative aspect-[4/5] rounded-token-md overflow-hidden bg-brand-pink/40">
+              <Image
+                src="/assets/stitch/ritual-completo.jpg"
+                alt="Produtos da linha Mari Beauty sobre bancada de mármore"
+                fill
+                sizes="(max-width: 1024px) 100vw, 480px"
+                className="object-cover"
               />
             </div>
             <div>
@@ -158,9 +170,9 @@ export default function SobrePage() {
                 </p>
                 <p>
                   Ela ainda testa pessoalmente cada lote antes do envio, mantém
-                  contato direto com clientes pelo WhatsApp da marca e
-                  publica, uma vez por mês, uma carta sobre o processo criativo
-                  por trás de cada fragrância.
+                  contato direto com clientes pelo WhatsApp da marca e publica,
+                  uma vez por mês, uma carta sobre o processo criativo por trás
+                  de cada fragrância.
                 </p>
               </div>
             </div>

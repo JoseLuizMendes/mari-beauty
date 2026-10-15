@@ -7,8 +7,8 @@
  * os arquivos existirem.
  *
  * Uso:
- *   <MediaBackground src="/assets/hero.jpg" alt="..." />
- *   <MediaBackground type="video" src="/assets/hero.mp4" poster="/assets/hero.jpg" alt="..." />
+ *   <MediaBackground src="/assets/hero1.png" alt="..." />
+ *   <MediaBackground type="video" src="/assets/inspiration/news-letter.mp4" poster="/assets/hero1.png" alt="..." />
  */
 
 import Image from "next/image";
