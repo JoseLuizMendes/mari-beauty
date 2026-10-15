@@ -14,6 +14,14 @@ auditor: "Claude Opus 5 (Claude Code)"
 
 # 🔍 Auditoria de Código + Plano de Evolução — Belessence
 
+> **Auditoria canônica mais recente:**
+> [`AUDITORIA-2026-10-15.md`](AUDITORIA-2026-10-15.md) — gerada a partir do
+> `[[Audit Template]]`, com checklist item a item, os 3 agentes norteadores e o
+> cruzamento com a Memória Imunológica.
+>
+> Este documento continua valendo: é **mais detalhado por achado** e guarda o
+> raciocínio de cada um. O de 2026-10-15 não o substitui, faz o que ele não fazia.
+
 > Auditoria feita contra o canon do vault (`Dev/Dev/0 - Planner Project/Preferencias Dev.md` v5.5,
 > `Master Pipeline & Enforcement` v2.3, `0.2 - Audit/Diretrizes.md`) e comparando com os projetos
 > irmãos `dr-gabriel-cavalcante-web`, `rotina-app`, `Wedding-New` e `MendeShift`.
