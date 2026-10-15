@@ -11,14 +11,25 @@
  */
 
 import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { generate } from "otplib";
 
-if (!fs.existsSync(".env")) {
-  console.error("Arquivo .env não encontrado. Rode dentro de frontend/belessence/.");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const cwdEnv = path.resolve(process.cwd(), ".env");
+const rootEnv = path.resolve(__dirname, "..", ".env");
+const envPath = fs.existsSync(cwdEnv) ? cwdEnv : rootEnv;
+
+if (!fs.existsSync(envPath)) {
+  console.error(
+    `Arquivo .env não encontrado em: ${envPath}\nCrie o arquivo .env na raiz do projeto a partir de .env.example.`,
+  );
   process.exit(1);
 }
 
-const m = fs.readFileSync(".env", "utf8").match(/^ADMIN_TOTP_SECRET="?([^"\r\n]+)"?/m);
+const m = fs
+  .readFileSync(envPath, "utf8")
+  .match(/^ADMIN_TOTP_SECRET="?([^"\r\n]+)"?/m);
 if (!m) {
   console.error("ADMIN_TOTP_SECRET não está no .env — 2FA não configurado.");
   process.exit(1);

@@ -13,6 +13,12 @@
 import fs from "fs";
 import bcrypt from "bcryptjs";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const password = process.argv[2];
 if (!password) {
   console.error('Uso: node scripts/admin-set-password.mjs "<nova-senha>"');
@@ -27,9 +33,14 @@ const hash = await bcrypt.hash(password, 12);
 const escaped = hash.replace(/\$/g, "\\$");
 const line = `ADMIN_PASSWORD_HASH="${escaped}"`;
 
-const envPath = ".env";
+const cwdEnv = path.resolve(process.cwd(), ".env");
+const rootEnv = path.resolve(__dirname, "..", ".env");
+const envPath = fs.existsSync(cwdEnv) ? cwdEnv : rootEnv;
+
 if (!fs.existsSync(envPath)) {
-  console.error("Arquivo .env não encontrado. Rode dentro de frontend/belessence/.");
+  console.error(
+    `Arquivo .env não encontrado em: ${envPath}\nCrie o arquivo .env na raiz do projeto a partir de .env.example.`,
+  );
   process.exit(1);
 }
 
