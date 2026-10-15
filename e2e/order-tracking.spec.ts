@@ -32,11 +32,7 @@ test.afterAll(async () => {
   await closeDb();
 });
 
-// Após Rodada Auth: checkout exige login (auth() redireciona pra /entrar).
-// Spec completo precisa do mesmo helper loginAsUser (T-extra-4) que o
-// `checkout-flow.spec.ts` aguarda — quando ele chegar, basta remover o
-// `.skip` (deixar como `test(...)`).
-test.skip("PREPARING: após checkout aprovado, pedido fica em PREPARING e modal mostra etapas com datas reais — a debugar (login OK)", async ({
+test("PREPARING: após checkout aprovado, pedido fica em PREPARING e modal mostra etapas com datas reais", async ({
   page,
   context,
 }) => {
@@ -117,13 +113,20 @@ test.skip("PREPARING: após checkout aprovado, pedido fica em PREPARING e modal 
   expect(t1).toBeGreaterThanOrEqual(t0);
 
   // 10. Abre o modal de rastreamento e valida as 3 etapas concluídas
+  //
+  // ⚠️ Buscar na página inteira dá conflito de modo estrito: "Em
+  // Separação" aparece duas vezes — no selo de status do pedido e na
+  // etapa da linha do tempo. São elementos diferentes dizendo a mesma
+  // coisa, e só o segundo é o que este teste afirma. Escopar no diálogo
+  // resolve e deixa explícito o que se está checando.
   await page.getByRole("button", { name: /rastrear pedido/i }).click();
+  const modal = page.getByRole("dialog");
   await expect(
-    page.getByRole("heading", { name: /rastreamento/i }),
+    modal.getByRole("heading", { name: /rastreamento/i }),
   ).toBeVisible();
-  await expect(page.getByText(/Pedido Recebido/i)).toBeVisible();
-  await expect(page.getByText(/Pagamento Confirmado/i)).toBeVisible();
-  await expect(page.getByText(/Em Separação/i)).toBeVisible();
+  await expect(modal.getByText(/Pedido Recebido/i)).toBeVisible();
+  await expect(modal.getByText(/Pagamento Confirmado/i)).toBeVisible();
+  await expect(modal.getByText(/Em Separação/i)).toBeVisible();
 });
 
 test("PREPARING idempotência (skip — coberta em unit)", async () => {
