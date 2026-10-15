@@ -39,6 +39,12 @@ export default defineConfig({
         "src/components/bottle-3d/**",
         // Rota de laboratório: existe só em dev (404 em produção).
         "src/app/lab/**",
+        // Imagens Open Graph (`ImageResponse`/satori). Não renderizam em
+        // jsdom — precisam do runtime de edge e de um rasterizador. A
+        // única parte com decisão real é a paleta, que tem guarda própria
+        // em `src/test/og-palette.test.ts`, cruzando os hex com o
+        // globals.css. Mesmo critério de src/components/bottle-3d.
+        "src/app/**/opengraph-image.tsx",
         "src/components/admin/cloudinary-upload.tsx",
         // Auth.js v5 config + Arctic OAuth — wiring declarativo, sem lógica
         // testável em unit (fluxo coberto por E2E + smoke real OAuth).
@@ -65,13 +71,17 @@ export default defineConfig({
       // 80% em statements/lines exige cobrir Server Actions admin e OAuth
       // flow — alvos de E2E, não unit. Subir conforme escrevemos mais tests.
       thresholds: {
-        // Piso ajustado ao real (~73%): a cobertura escorregou ao longo dos 123
-        // commits enquanto o CI nao rodava na master. Ratchet: voltar a subir
-        // para 75 conforme novos testes forem escritos.
-        statements: 73,
-        branches: 80,
-        functions: 79,
-        lines: 73,
+        // Piso ajustado ao real: a cobertura escorregou ao longo dos 123
+        // commits enquanto o CI nao rodava na master, e o piso foi baixado
+        // para 73 em vez de a cobertura ser recuperada. Ratchet só sobe.
+        //
+        // 2026-10-15 (PR do SEO): 73,31% → 74,72%. O bounded context `seo/`
+        // nasceu com 100% em domain. Piso subiu 73 → 74. Alvo seguinte: 75,
+        // o valor de onde ele nunca deveria ter saído.
+        statements: 74,
+        branches: 85,
+        functions: 81,
+        lines: 74,
       },
     },
   },
