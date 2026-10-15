@@ -88,8 +88,20 @@ const optionalEnvSchema = z.object({
    */
   MP_ACCESS_TOKEN: z.string().optional(),
 
-  // Fornecida pela Vercel; usada pelo /api/health
+  // Fornecida pela Vercel; usada pelo /api/health e como `release` do Sentry
   VERCEL_GIT_COMMIT_SHA: z.string().optional(),
+
+  /**
+   * Sentry. A AUSÊNCIA é significativa, como no Mercado Pago: sem DSN o
+   * `instrumentation.ts` não inicializa o SDK e nada é enviado.
+   *
+   * São dois nomes porque servem a lados diferentes: `SENTRY_DSN` é lido
+   * só no servidor; `NEXT_PUBLIC_SENTRY_DSN` é inlinado no bundle do
+   * cliente pelo Next. Configurar só o público também funciona — o
+   * servidor cai nele.
+   */
+  SENTRY_DSN: z.string().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
 });
 
 const serverEnvSchema = coreEnvSchema.merge(optionalEnvSchema);
@@ -115,6 +127,11 @@ const featureGroups = {
   cloudinary: ["CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"],
   /** Gateway de pagamento real (sem isto, o checkout roda em mock). */
   mercadoPago: ["MP_ACCESS_TOKEN"],
+  /**
+   * Captura de erro em produção. Basta o DSN público: o servidor usa
+   * `SENTRY_DSN` quando existe e cai no público quando não.
+   */
+  sentry: ["NEXT_PUBLIC_SENTRY_DSN"],
 } as const satisfies Record<string, readonly (keyof ServerEnv)[]>;
 
 export type FeatureName = keyof typeof featureGroups;

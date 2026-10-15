@@ -43,6 +43,8 @@
     "@react-email/render": "^1.0.5",
     "@react-three/drei": "10.7.9",
     "@react-three/fiber": "9.8.2",
+    "@sentry/nextjs": "^11.8.0",
+    "@sentry/server-runtime-injection": "^11.8.0",
     "arctic": "^3.7.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
