@@ -17,14 +17,20 @@ sem nenhum arquivo de modelo**.
 Referência de comportamento: <https://soda-landingpage.vercel.app/>.
 **Referência de implementação: nenhuma** — ver §3, por que não copiamos a técnica dela.
 
+> **Escopo, para não haver dúvida:** esta spec cobre **apenas** a página de produto.
+> O comportamento tipo-soda na home é assunto da
+> [spec 002](../002-hero-frames/spec.md), que o resolve com frames pré-renderizados
+> em vez de WebGL — e reaproveita o modelo paramétrico desta aqui como fonte dos
+> frames. As duas compartilham o frasco; não compartilham a técnica.
+
 ## 2. Decisões tomadas (2026-10-14)
 
-| Decisão         | Escolha                              | Motivo                                                                                                       |
-| --------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
-| Onde            | **Só `/product/[slug]`**             | Hero e catálogo ficam 2D. Um contexto WebGL por vez, e só quando o usuário já demonstrou intenção de compra. |
-| Origem da malha | **Procedural em JS**                 | GLB por SKU é inviável em custo.                                                                             |
-| Lib             | **React Three Fiber + drei + three** | Ver §3.                                                                                                      |
-| Ordem           | **Depois dos P0 da auditoria**       | A loja precisa receber dinheiro antes de ficar bonita.                                                       |
+| Decisão         | Escolha                              | Motivo                                                                                                                                                                                      |
+| --------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Onde            | **Só `/product/[slug]`**             | Catálogo fica 2D; o hero ganha movimento por outro caminho — ver [spec 002](../002-hero-frames/spec.md). Um contexto WebGL por vez, e só quando o usuário já demonstrou intenção de compra. |
+| Origem da malha | **Procedural em JS**                 | GLB por SKU é inviável em custo.                                                                                                                                                            |
+| Lib             | **React Three Fiber + drei + three** | Ver §3.                                                                                                                                                                                     |
+| Ordem           | **Depois dos P0 da auditoria**       | A loja precisa receber dinheiro antes de ficar bonita.                                                                                                                                      |
 
 ## 3. Por que não a stack do soda
 
