@@ -10,21 +10,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/shared/infrastructure/prisma-client";
 import { z } from "zod";
+import { enforceRateLimit } from "@/lib/shared/infrastructure/with-rate-limit";
+import { HONEYPOT_FIELD_NAME } from "@/components/ui/honeypot-field";
 
 const bodySchema = z.object({
   email: z.string().email("Email inválido"),
 });
 
 export async function POST(req: NextRequest) {
+  const blocked = await enforceRateLimit(req, "newsletter");
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
+    // Honeypot: humano não vê o campo, bot preenche. Respondemos como
+    // sucesso de propósito — devolver erro ensina o bot a tentar de novo
+    // sem o campo. Para ele, parece que funcionou; nada foi gravado.
+    if (
+      typeof body?.[HONEYPOT_FIELD_NAME] === "string" &&
+      body[HONEYPOT_FIELD_NAME].length > 0
+    ) {
+      console.warn(
+        "[/api/newsletter] honeypot acionado — descartado silenciosamente",
+      );
+      return NextResponse.json(
+        { ok: true, alreadySubscribed: false },
+        { status: 200 },
+      );
+    }
+
     const parsed = bodySchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Email inválido" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Email inválido" }, { status: 400 });
     }
 
     const email = parsed.data.email.toLowerCase().trim();

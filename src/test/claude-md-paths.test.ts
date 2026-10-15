@@ -63,7 +63,8 @@ const PLANNED_MARKER =
  * essas linhas forçaria a reescrever a história a cada refactor, que foi
  * exatamente o estrago que a primeira versão desta varredura causou.
  */
-const HISTORICAL_MARKER = /(\bex-`|→|\bmovid[oa]s?\b|^#+\s*Histórico)/i;
+const HISTORICAL_MARKER =
+  /(\bex-`|→|\bmovid[oa]s?\b|\bantes d[eo]\b|^#+\s*Histórico)/i;
 
 /** Ferramenta do vault Dev (fora deste repo) citada no cabeçalho de origem. */
 const EXTERNAL_PATHS = new Set(["tools/generate-claude-md.js"]);

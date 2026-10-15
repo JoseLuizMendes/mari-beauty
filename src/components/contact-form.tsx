@@ -23,12 +23,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  HoneypotField,
+  HONEYPOT_FIELD_NAME,
+} from "@/components/ui/honeypot-field";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Informe seu nome"),
   email: z.string().email("E-mail inválido"),
   subject: z.string().min(3, "Informe um assunto"),
   message: z.string().min(10, "Mensagem muito curta (mínimo 10 caracteres)"),
+  // Honeypot: nunca validado no client — quem julga é o servidor.
+  [HONEYPOT_FIELD_NAME]: z.string().optional(),
 });
 
 type ContactInput = z.infer<typeof contactSchema>;
@@ -44,7 +50,12 @@ export function ContactForm() {
     resolver: zodResolver(contactSchema),
     defaultValues: { name: "", email: "", subject: "", message: "" },
   });
-  const { handleSubmit, reset, formState: { isSubmitting } } = form;
+  const {
+    handleSubmit,
+    register,
+    reset,
+    formState: { isSubmitting },
+  } = form;
 
   const onSubmit = async (data: ContactInput) => {
     try {
@@ -71,6 +82,7 @@ export function ContactForm() {
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <HoneypotField register={register(HONEYPOT_FIELD_NAME)} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -79,7 +91,11 @@ export function ContactForm() {
               <FormItem>
                 <FormLabel className={labelClasses}>Nome</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Seu nome" className={inputClasses} />
+                  <Input
+                    {...field}
+                    placeholder="Seu nome"
+                    className={inputClasses}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
