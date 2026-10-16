@@ -22,9 +22,7 @@ import {
   ExternalLink,
   Clock,
 } from "lucide-react";
-import type {
-  TrackingOrderData,
-} from "@/lib/orders/domain/order-tracking";
+import type { TrackingOrderData } from "@/lib/orders/domain/order-tracking";
 import type { OrderStatus } from "@/lib/orders/domain/order-types";
 
 /* ─── Types ────────────────────────────────────────────────── */
@@ -190,7 +188,7 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
 
   // Estima a data de entrega: createdAt + 7 dias
   const estimatedDelivery = new Date(
-    createdAt.getTime() + 7 * 24 * 60 * 60 * 1000
+    createdAt.getTime() + 7 * 24 * 60 * 60 * 1000,
   );
 
   return (
@@ -249,7 +247,9 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
           </div>
 
           <p className="text-xs text-ink-muted mt-2">
-            <span className="text-ink-soft font-medium">{order.customerName}</span>
+            <span className="text-ink-soft font-medium">
+              {order.customerName}
+            </span>
           </p>
         </DialogHeader>
 
@@ -292,8 +292,7 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
           <ol className="relative" aria-label="Timeline de rastreamento">
             {TIMELINE_STEPS.map((step, idx) => {
               const isCompleted = !isCancelled && idx < completedCount;
-              const isCurrent =
-                !isCancelled && idx === completedCount - 1;
+              const isCurrent = !isCancelled && idx === completedCount - 1;
               const isPending = !isCancelled && idx >= completedCount;
               const stepDate = resolveStepDate(step, order.events, createdAt);
 
@@ -321,7 +320,10 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
                         isPending
                           ? {
                               background:
-                                "repeating-linear-gradient(to bottom, #d1d5db 0, #d1d5db 3px, transparent 3px, transparent 6px)",
+                                // Mesmo token do ramo de className logo acima: o pontilhado
+                                // é o mesmo efeito, e o hex frio que estava aqui
+                                // ignorava o tema escuro.
+                                "repeating-linear-gradient(to bottom, var(--color-ink-muted) 0, var(--color-ink-muted) 3px, transparent 3px, transparent 6px)",
                             }
                           : undefined
                       }

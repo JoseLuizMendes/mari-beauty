@@ -9,9 +9,12 @@
 - `json-ld.ts` recebe `ProductSeoInput` (dados simples), não a entidade do
   repositório. Mudança no `Product` do Prisma não deve obrigar mudança
   aqui.
-- `og-palette.ts` é a **única** exceção a "nada de hex em TS": `satori`
-  não resolve `var(--color-*)`. Espelha `src/app/globals.css` e tem teste
-  que falha se divergir.
+- `og-palette.ts` é exceção a "nada de hex em TS": `satori` não resolve
+  `var(--color-*)`. Espelha `src/app/globals.css` e tem teste que falha se
+  divergir. **Não é mais a única** — `src/lib/design/domain/scene-palette.ts`
+  entrou pelo mesmo motivo (WebGL também não resolve `var()`), seguindo este
+  arquivo como modelo. A regra que vale para as duas: hex em TS só com
+  renderizador que não lê CSS, e sempre com teste de espelho.
 
 ## Conteúdo
 

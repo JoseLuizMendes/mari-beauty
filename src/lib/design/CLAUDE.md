@@ -22,11 +22,16 @@ escopo: "Bounded context Design — tokens visuais (OKLCH palette, tipografia, e
 
 ## 1. Escopo
 
-- Paleta Mari Beauty em **hex**: wine `#47131C`, rosé `#FFD7E7`, marfim `#FFFDE9`
-- Tipografia, espaçamento, sizing
 - Perfil paramétrico do frasco 3D (`bottle-profile.ts`)
+- Cor da cena 3D (`scene-palette.ts`) — espelho de `--color-scene-backdrop`
+- Aritmética de contraste WCAG (`contrast.ts`)
+- `tokens.ts` — material de referência do estudo de design; **não** é a
+  paleta em uso (ver §7.1)
 
-Tudo o que descreve **como o produto Mari Beauty parece** vive aqui. Mudanças aqui afetam TODO o sistema visual.
+> ⚠️ **A paleta Mari Beauty não vive aqui.** Ela vive em
+> [`src/app/globals.css`](../../app/globals.css): wine `#47131C`, rosé
+> `#FFD7E7`, marfim `#FFFDE9`. Esta seção afirmava o contrário e estava
+> errada — ver §7.1.
 
 ---
 
@@ -35,8 +40,10 @@ Tudo o que descreve **como o produto Mari Beauty parece** vive aqui. Mudanças a
 ```
 src/lib/design/
 ├── domain/
-│   ├── tokens.ts           # ex-`src/lib/design-tokens.ts`
-│   └── bottle-profile.ts   # frasco 3D como dado — spec 001
+│   ├── tokens.ts           # ex-`src/lib/design-tokens.ts` — ver §7.1
+│   ├── bottle-profile.ts   # frasco 3D como dado — spec 001
+│   ├── scene-palette.ts    # hex da cena 3D (WebGL não lê var())
+│   └── contrast.ts         # razão de contraste WCAG — aritmética pura
 └── CLAUDE.md
 ```
 
@@ -46,9 +53,19 @@ Sem `application/`/`infrastructure/`/`presentation/`: design tokens não têm re
 
 ## 3. Diretrizes
 
-- **Tokens são fonte da verdade.** Componentes que usam cores/fontes/espaçamento DEVEM importar daqui — nunca hardcode hex/RGB no componente.
-- **Tailwind config** lê valores daqui via `tailwind.config.ts` (quando aplicável — Tailwind v4 lê do CSS).
-- **Mudanças de paleta:** atualizar `tokens.ts` + `globals.css` (variáveis CSS) juntos. Sem isso, fica drift entre TS e CSS.
+- **`globals.css` é a fonte da verdade de cor.** Componente usa token
+  (`bg-primary`, `text-ink-muted`, `bg-scene-backdrop`) — nunca hex/RGB
+  solto. Isto não mudou; o que mudou é de onde o token vem.
+- **Cor nova:** declarar em `globals.css`. Se ficar fora do `@theme inline`
+  — como as `--color-brand-*`, `--color-ink-*` e `--color-scene-backdrop`
+  ficam — o utilitário **precisa ser declarado à mão** no
+  `@layer utilities`, senão a classe não gera CSS e o estilo some em
+  silêncio.
+- **Espelho em TS só com motivo técnico:** o renderizador não lê CSS.
+  Hoje são dois (`scene-palette.ts` aqui, `../seo/domain/og-palette.ts` lá), e
+  cada um tem teste de espelho. Não crie um terceiro por conveniência.
+- **Não** mande ninguém "adicionar ao `tokens.ts` primeiro". Era o que esta
+  seção dizia, e seguir isso leva a cor para um arquivo que ninguém lê.
 
 ---
 
@@ -60,8 +77,12 @@ Sem `application/`/`infrastructure/`/`presentation/`: design tokens não têm re
 
 ## 5. Testes
 
-- `tokens.ts`: sem suite dedicada — valores literais, testes seriam tautológicos.
+- `tokens.ts`: sem suite dedicada — valores literais, e hoje quase todos
+  sem consumidor (§7.1).
 - `bottle-profile.ts`: `src/test/bottle-profile.test.ts` cobre as invariantes de geometria (líquido dentro da cavidade, tampa no topo, raio limitado).
+- `scene-palette.ts`: `src/test/scene-palette.test.ts` — espelho do
+  `globals.css` **e** existência do utilitário `.bg-scene-backdrop`.
+- `contrast.ts`: `src/test/contrast-aa.test.ts` (ver §9).
 
 ---
 
@@ -74,6 +95,37 @@ Nenhuma — domain puro.
 ## 7. Histórico
 
 - **2026-05-30 (Rodada 4.2):** `src/lib/design-tokens.ts` → `src/lib/design/domain/tokens.ts`. 1 consumer (`gsap-utils.ts`) atualizado.
+
+### 7.1 O que o `tokens.ts` realmente é
+
+Três `CLAUDE.md` afirmavam que ele é a fonte única de cor em TypeScript e
+que componente **deve** importar dele. Medido em 2026-10-16, nenhuma das
+três afirmações era verdadeira:
+
+| Afirmação                                | Realidade                                                                 |
+| ---------------------------------------- | ------------------------------------------------------------------------- |
+| "Paleta Mari Beauty em **hex**"          | `colors` é gold/ivory em **OKLCH** — a paleta anterior ao rebrand         |
+| "Componentes DEVEM importar daqui"       | **0** componentes importam                                                |
+| "Fonte única; `globals.css` é o espelho" | É o contrário: `globals.css` é a fonte e nada em TS espelha a paleta dela |
+
+Dos **11 exports**, **10 têm zero consumidor** (`colors`, `typography`,
+`spacing`, `radius`, `gradients`, `shadows`, `breakpoints`, `glass`,
+`grid`, `lorealSystem`). O único vivo é **`motion`**, importado por
+`src/lib/motion/presentation/gsap-helpers.ts`.
+
+**Por que isso importa mais do que parece:** o `og-palette.ts` já tinha
+registrado no cabeçalho dele que `tokens.ts` divergia — e a nota ficou lá,
+sozinha, enquanto os `CLAUDE.md` continuavam mandando o próximo agente para
+o arquivo errado. Seguir a instrução ao pé da letra para a cor da cena 3D
+teria enterrado um token novo num arquivo que ninguém lê.
+
+É o mesmo P0.4 da auditoria (caminho morto no `CLAUDE.md`), só que em prosa
+— e o `claude-md-paths.test.ts` diz explicitamente que não pega prosa. Os
+caminhos continuam verificados; as **afirmações** não.
+
+**O que NÃO foi feito aqui:** apagar os 10 exports mortos. É material do
+estudo de referência (Byredo/Aesop/MFK/L'Oréal) e a decisão de descartar ou
+reaproveitar é do dev, não de quem passou por aqui corrigindo hex.
 
 ---
 
