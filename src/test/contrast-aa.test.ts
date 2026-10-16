@@ -96,13 +96,22 @@ const PARES: Array<{ fundo: string; texto: string; nivel: NivelAA }> = [
  * (sem ele não se sabe onde o teclado está) e passa com folga nos dois
  * temas.
  *
- * `--border` e `--input` **não** entram, e o motivo está documentado em
- * `src/lib/design/CLAUDE.md` §9: hoje reprovam, a correção exige escolher
- * cor nova, e a identidade visual final — que redefine a paleta inteira —
- * ainda não chegou. Travar o CI num valor que vai mudar não protege nada.
+ * `--input` **entra**. Entrou em 2026-10-16: o campo é `bg-transparent` no
+ * tema claro, então a borda é a única coisa que diz onde clicar, e ela
+ * dava 1,58:1. Não precisou de cor nova — `--color-ink-muted`, que já
+ * estava na paleta, dá 4,81:1 no claro e 8,90:1 no escuro.
+ *
+ * Deixar de asserir era defensável enquanto não havia correção possível
+ * sem inventar valor de marca. Havia.
+ *
+ * `--border` continua **fora**, e o motivo está em
+ * `src/lib/design/CLAUDE.md` §9: o card tem `bg-card` e `--shadow-card`, e
+ * borda de agrupamento que não identifica controle nem estado é tratada
+ * como decorativa pela norma. Fica registrado, não afirmado.
  */
 const COMPONENTES: Array<{ fundo: string; frente: string }> = [
   { fundo: "--background", frente: "--ring" },
+  { fundo: "--background", frente: "--input" },
 ];
 
 const TEMAS: Array<[string, Map<string, string>]> = [
