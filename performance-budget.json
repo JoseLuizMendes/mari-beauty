@@ -1,0 +1,18 @@
+{
+  "_leiaMe": "Orçamento de performance do Belessence. Verificado no CI: `scripts/orcamento-performance.mjs` (bundle, roda no job e2e depois do build) e `src/test/orcamento-assets.test.ts` (public/, roda no job unit). Teto SÓ DESCE — ver `CLAUDE.md` §7.",
+  "_medidoEm": "2026-10-16",
+  "bundle": {
+    "_leiaMe": "Tudo em KB de gzip, medido em .next/static depois de `pnpm build`.",
+    "baselineJsGzipKb": 270,
+    "maiorChunkJsGzipKb": 300,
+    "totalClientJsGzipKb": 1024,
+    "cssGzipKb": 40
+  },
+  "assets": {
+    "_leiaMe": "Arquivos de public/, que são servidos como estão. KB = 1024 bytes.",
+    "imagemKb": 1900,
+    "videoKb": 9600,
+    "svgKb": 16,
+    "totalPublicMb": 56
+  }
+}

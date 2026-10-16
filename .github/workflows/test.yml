@@ -118,6 +118,14 @@ jobs:
       - name: Run E2E
         run: pnpm test:e2e --project=chromium
 
+      # O webServer da Playwright roda `pnpm build && pnpm start` em CI, então
+      # o build de produção já está em `.next/` aqui — medir é de graça. Roda
+      # com `!cancelled()` porque, se o E2E quebrar, o orçamento ainda tem o
+      # que medir e a informação continua valendo.
+      - name: Orçamento de performance (bundle)
+        if: ${{ !cancelled() }}
+        run: pnpm perf:orcamento
+
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v5

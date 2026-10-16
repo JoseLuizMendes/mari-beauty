@@ -82,6 +82,7 @@ pnpm test:e2e       # playwright
 pnpm db:up          # docker compose up -d
 pnpm migrate        # prisma migrate dev
 pnpm db:seed        # prisma db seed
+pnpm perf:orcamento # orçamento de performance do bundle (exige build antes)
 ```
 
 `postinstall` roda `prisma generate` — não removê-lo.
@@ -150,6 +151,19 @@ O schema tem dois níveis:
 - Animações pesadas (GSAP) são opt-in client-side; evitar carregar GSAP em
   RSC ou layout root.
 - Prisma client é singleton — não instanciar manualmente.
+- **Há orçamento de performance, e ele quebra o CI.** Tetos em
+  [`performance-budget.json`](performance-budget.json), medidos em dois
+  lugares:
+
+  | O quê                                     | Onde roda                                 | Como                                                                     |
+  | ----------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------ |
+  | Bundle (JS baseline, maior chunk, CSS)    | job `e2e`, depois do build que ele já faz | [`scripts/orcamento-performance.mjs`](scripts/orcamento-performance.mjs) |
+  | Assets de `public/` (por arquivo e total) | job `unit`                                | [`src/test/orcamento-assets.test.ts`](src/test/orcamento-assets.test.ts) |
+
+  Por arquivo, e não só no total, porque o erro que custou caro foi **um**
+  PNG de 1,5MB entre dezenas de arquivos pequenos — média não pega isso.
+  Peso novo que não é necessário na primeira carga vai em `next/dynamic`.
+  É assim que o `three.js` já está: 265KB gzip fora do baseline.
 
 ### 6.4 Testes
 
@@ -182,3 +196,6 @@ O schema tem dois níveis:
   framer historicamente; ignorar.)
 - Não baixar o piso de cobertura do `vitest.config.ts` para fazer o CI passar.
   Ratchet só sobe.
+- Não subir teto do `performance-budget.json` para fazer o CI passar. Ratchet
+  só desce. Se o peso é inevitável, o teto sobe **no mesmo commit** e a
+  mensagem explica por quê — assim fica no histórico quem autorizou.

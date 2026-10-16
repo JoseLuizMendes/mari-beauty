@@ -24,7 +24,8 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "prepare": "husky",
-    "imagens:otimizar": "node scripts/otimizar-imagens.mjs"
+    "imagens:otimizar": "node scripts/otimizar-imagens.mjs",
+    "perf:orcamento": "node scripts/orcamento-performance.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
