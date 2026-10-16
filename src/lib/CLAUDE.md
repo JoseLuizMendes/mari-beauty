@@ -126,14 +126,15 @@ múltiplas conexões e vaza pool.
   exports não tinham consumidor. Os dez foram apagados; sobrou `motion`,
   usado por `motion/presentation/gsap-helpers.ts`. Ver §7.1 do
   [`design/CLAUDE.md`](design/CLAUDE.md).
-- ⚠️ **Modificador de opacidade em cor de marca não funciona hoje.**
-  `bg-brand-wine/80`, `text-brand-pink/60` e afins **não geram CSS** — são
-  165 classes mortas no `src/`. As famílias `brand-*`, `ink-*` e
-  `surface-*` estão em `:root` puro, não no `@theme`, e o Tailwind v4 só
-  monta `/NN` para cor registrada. Use a forma simples
-  (`bg-brand-wine`, `text-ink-muted`) ou uma cor do shadcn
-  (`bg-muted/50`, `border-border/40` funcionam). Diagnóstico e a correção
-  proposta em §7.2 do [`design/CLAUDE.md`](design/CLAUDE.md).
+- **Modificador de opacidade funciona** (`bg-brand-wine/80`,
+  `text-brand-pink/60`) desde 2026-10-16. Antes disso **não gerava CSS**:
+  as famílias `brand-*`, `ink-*` e `surface-*` viviam só no `:root`, e o
+  Tailwind v4 só monta `/NN` para cor registrada no `@theme` — eram 156
+  classes mortas, 30 delas estados de `hover:` que nunca aconteciam.
+  Cor nova entra com o par `--<nome>` no `:root` **e**
+  `--color-<nome>: var(--<nome>)` no `@theme inline`;
+  `src/test/opacidade-de-cor.test.ts` recusa o contrário. História em §7.2
+  do [`design/CLAUDE.md`](design/CLAUDE.md).
 - Cor nova vai no `globals.css` (token + utilitário à mão, se ficar fora do
   `@theme inline`). Só ganha espelho em TS se um renderizador fora do
   navegador precisar dela.

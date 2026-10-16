@@ -34,10 +34,12 @@ Beauty**. Nome do package: `mari-beauty`.
   [`src/lib/design/domain/tokens.ts`](src/lib/design/domain/tokens.ts) tem
   **só motion do GSAP**; já disse que era a fonte de cor e não era (ver
   [`src/lib/design/CLAUDE.md`](src/lib/design/CLAUDE.md) §7.1).
-  ⚠️ **`bg-brand-wine/80` e afins não geram CSS** — 165 classes mortas,
-  diagnóstico em §7.2 do mesmo arquivo.
-  Os tokens de marca são **hex** (`--color-brand-wine: #47131C`), com uma
-  camada de compatibilidade semântica para o shadcn. Não são OKLCH.
+  Cor de marca aceita modificador de opacidade (`bg-brand-wine/80`) desde
+  2026-10-16 — antes disso 156 classes não geravam CSS. Guardado por
+  `src/test/opacidade-de-cor.test.ts`; história em §7.2.
+  Os tokens de marca são **hex**, declarados em `--brand-wine` e cia., com
+  o ponteiro `--color-brand-wine` no `@theme inline` e uma camada de
+  compatibilidade semântica para o shadcn. Não são OKLCH.
   **Espaçamento tem escala de 8pt com nomes semânticos** (`p-card`,
   `gap-block`, `py-section`) — nunca numéricos, que colidiriam com a escala
   do Tailwind. Ver [`src/lib/design/CLAUDE.md`](src/lib/design/CLAUDE.md) §8.

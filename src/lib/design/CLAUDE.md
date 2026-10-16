@@ -137,49 +137,70 @@ nomenclatura é trabalho à parte, não feito aqui.
 
 ---
 
-## 7.2 ⚠️ 165 classes de opacidade que não geram CSS
+## 7.2 As classes de opacidade — resolvido em 2026-10-16
 
-Medido em 2026-10-16, no CSS do build.
+Durante meses, **156 classes não geraram CSS nenhum**. `bg-brand-wine/80`
+não era 80% de vinho: era **nada**.
 
-No Tailwind v4, o modificador de opacidade (`/80`, `/10`) só existe para
-cor **registrada no `@theme`**. As famílias `--color-brand-*`,
-`--color-ink-*` e `--color-surface-*` estão em `:root` puro, e os
-utilitários delas são **escritos à mão** no `@layer utilities` — 23 regras
-que cobrem só a forma simples.
+No Tailwind v4 o modificador de opacidade só existe para cor registrada no
+`@theme`. As famílias `brand-*`, `ink-*` e `surface-*` moravam só no
+`:root`, e os utilitários delas eram escritos à mão no `@layer utilities` —
+23 regras que cobriam só a forma simples.
 
-Resultado: `bg-brand-wine/80` não gera regra nenhuma. Não é "80% de wine" —
-é **nada**. O build confirma: zero seletores com barra escapada para essas
-três famílias, enquanto `.bg-muted\/50` e `.border-border\/40` existem
-normalmente, porque `muted` e `border` estão no `@theme inline`.
+### O que estava quebrado, medido antes de consertar
 
-| Família                       | Classes com `/NN` no `src/` |
-| ----------------------------- | --------------------------- |
-| `bg-brand-wine/NN`            | 53                          |
-| `text-brand-pink/NN`          | 32                          |
-| `bg-brand-pink/NN`            | 19                          |
-| `border-brand-wine/NN`        | 17                          |
-| `border-brand-pink/NN`        | 10                          |
-| `text-brand-wine/NN`          | 9                           |
-| outras (`ink-*`, `surface-*`) | 25                          |
-| **total**                     | **165**                     |
+| Categoria                                               | Quantas |
+| ------------------------------------------------------- | ------- |
+| `hover:` / `focus:` que não acontecia                   | **30**  |
+| Propriedade que não era aplicada (nada renderizava)     | **126** |
+| Mudança apenas de tom (tinha irmão de cor renderizando) | **0**   |
 
-### A correção, e por que não está neste PR
+**Zero** eram escolha estética. Eram 156 bugs — skeleton de loading
+invisível, botão sem estado de hover, fundo que não existia. A primeira
+contagem desta seção dizia "165 classes mortas" e a segunda separava "78
+bugs / 77 mudanças de tom"; as duas estavam erradas, e só a terceira —
+classificando por variante de estado e por irmão de cor da **mesma
+propriedade** — bateu. Contar o que parece não substitui classificar o que é.
 
-Registrar as três famílias no `@theme inline` resolve tudo de uma vez — e
-aí os 23 utilitários à mão viram redundantes e saem. Há um detalhe: não dá
-para escrever `@theme inline { --color-ink-strong: var(--color-ink-strong) }`,
-que é circular. Os nomes de runtime precisam mudar (`--ink-strong`), como o
-shadcn já faz neste mesmo arquivo com `--foreground`/`--color-foreground`.
-As ~88 referências `var(--color-X-*)` **continuam funcionando** sem
-alteração, porque o Tailwind emite os tokens do `@theme` no `:root`. O que
-muda é a definição, o `.dark`, e o mapeamento dos dois testes de espelho
-(`og-palette.test.ts`, `scene-palette.test.ts`), que leem hex literal do
-CSS.
+### A correção
 
-**O que trava:** no dia em que isso entrar, 165 regras de translucidez
-passam a valer de uma vez, em páginas onde nunca valeram. É mudança visual
-no site inteiro e precisa de olho humano no preview — não cabe de carona
-num PR sobre hex e cinza.
+Os valores de runtime perderam o prefixo: `--color-brand-wine` virou
+`--brand-wine` no `:root` e no `.dark`. O `@theme inline` passou a declarar
+`--color-brand-wine: var(--brand-wine)`, que é o que faz o Tailwind gerar a
+família inteira — `bg-`, `text-`, `border-`, `fill-`, `from-`, com `/NN` e
+com `hover:`.
+
+O prefixo não pode repetir dos dois lados: `--color-x: var(--color-x)` é
+circular. É o mesmo par que o shadcn já usava aqui com
+`--foreground`/`--color-foreground`.
+
+As **18 regras escritas à mão** dessas famílias foram apagadas — o Tailwind
+gera todas, e com as variantes. Ficaram só `.bg-ink-overlay-*` e
+`.border-brand`, que têm nome próprio e não saem do rename.
+
+`var(--color-brand-wine)` **continua resolvendo**: o `@theme inline` emite
+as variáveis no `:root` do CSS final. Os dois usos em `style` inline de
+componente não precisaram mudar.
+
+### Verificado no CSS do build
+
+`.bg-brand-wine\/80`, `.bg-brand-wine\/5`, `.text-ink-muted\/50`,
+`.hover\:bg-brand-pink\/8` — todas emitidas, com `color-mix`. A forma
+simples (`.bg-brand-wine`, `.fill-brand-wine`) continua existindo, agora
+gerada. Custo: CSS de 28,8 → **30,1 KB** gzip, contra um teto de 40.
+
+### O guard
+
+`src/test/opacidade-de-cor.test.ts` varre o `src/` e exige que **toda**
+família usada com `/NN` esteja declarada no `@theme inline`. Cor nova só no
+`:root` + uso com `/NN` quebra o teste.
+
+Verificado removendo um registro: 26 classes órfãs acusadas de uma vez.
+
+> **Por que o guard existe desta forma:** não dava para ver o problema. A
+> classe está no JSX, o build passa, o lint passa, o typecheck passa. Só
+> olhando o CSS gerado. Este teste olha o `globals.css`, que é onde a causa
+> mora, e não precisa de build para rodar.
 
 ---
 

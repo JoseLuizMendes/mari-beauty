@@ -5,26 +5,26 @@
 
 :root {
   /* Mari Beauty palette */
-  --color-brand-wine: #47131c;
-  --color-brand-wine-soft: #6b1f2c;
-  --color-brand-wine-deep: #2e0b12;
+  --brand-wine: #47131c;
+  --brand-wine-soft: #6b1f2c;
+  --brand-wine-deep: #2e0b12;
 
-  --color-brand-pink: #ffd7e7;
-  --color-brand-pink-soft: #ffe8f0;
+  --brand-pink: #ffd7e7;
+  --brand-pink-soft: #ffe8f0;
 
   /* Compat aliases — mantém usos existentes de brand-gold apontando para wine/pink */
-  --color-brand-gold: var(--color-brand-wine);
-  --color-brand-gold-light: var(--color-brand-pink);
-  --color-brand-gold-deep: var(--color-brand-wine-deep);
+  --brand-gold: var(--brand-wine);
+  --brand-gold-light: var(--brand-pink);
+  --brand-gold-deep: var(--brand-wine-deep);
 
-  --color-ink-strong: #2e0b12;
-  --color-ink-soft: #5a2a33;
-  --color-ink-muted: #8a6770;
+  --ink-strong: #2e0b12;
+  --ink-soft: #5a2a33;
+  --ink-muted: #8a6770;
 
-  --color-surface-base: #fffde9;
-  --color-surface-section: #fff3e8;
-  --color-surface-panel: #ffffff;
-  --color-surface-contrast: #ffffff;
+  --surface-base: #fffde9;
+  --surface-section: #fff3e8;
+  --surface-panel: #ffffff;
+  --surface-contrast: #ffffff;
 
   --color-border-subtle: #f0e5d8;
   --color-border-strong: #d9c9b8;
@@ -51,45 +51,45 @@
   --color-scene-backdrop: #0f5a58;
 
   /* Semantic compatibility with shadcn and tailwind */
-  --background: var(--color-surface-base);
-  --foreground: var(--color-ink-strong);
-  --card: var(--color-surface-panel);
-  --card-foreground: var(--color-ink-strong);
-  --popover: var(--color-surface-contrast);
-  --popover-foreground: var(--color-ink-strong);
-  --primary: var(--color-brand-wine);
-  --primary-foreground: var(--color-surface-base);
-  --secondary: var(--color-brand-pink);
-  --secondary-foreground: var(--color-brand-wine);
-  --accent: var(--color-surface-base);
-  --accent-foreground: var(--color-brand-wine);
-  --muted: var(--color-surface-section);
-  --muted-foreground: var(--color-ink-muted);
+  --background: var(--surface-base);
+  --foreground: var(--ink-strong);
+  --card: var(--surface-panel);
+  --card-foreground: var(--ink-strong);
+  --popover: var(--surface-contrast);
+  --popover-foreground: var(--ink-strong);
+  --primary: var(--brand-wine);
+  --primary-foreground: var(--surface-base);
+  --secondary: var(--brand-pink);
+  --secondary-foreground: var(--brand-wine);
+  --accent: var(--surface-base);
+  --accent-foreground: var(--brand-wine);
+  --muted: var(--surface-section);
+  --muted-foreground: var(--ink-muted);
   --destructive: #b84040;
   --border: var(--color-border-subtle);
   /* O campo é `bg-transparent` no tema claro: a borda é a ÚNICA coisa que
    * marca onde se clica para digitar. Com `--color-border-strong` dava
    * 1,58:1 contra o fundo — reprovava o mínimo de 3:1 da WCAG 1.4.11 e,
-   * na prática, sumia. `--color-ink-muted` dá 4,81:1 no claro e 8,90:1 no
+   * na prática, sumia. `--ink-muted` dá 4,81:1 no claro e 8,90:1 no
    * escuro, e já é da paleta: não inventa cor.
    * Guardado por `src/test/contrast-aa.test.ts`. */
-  --input: var(--color-ink-muted);
-  --ring: var(--color-brand-wine);
+  --input: var(--ink-muted);
+  --ring: var(--brand-wine);
 
-  --chart-1: var(--color-brand-wine);
-  --chart-2: var(--color-brand-pink);
-  --chart-3: var(--color-brand-wine-soft);
+  --chart-1: var(--brand-wine);
+  --chart-2: var(--brand-pink);
+  --chart-3: var(--brand-wine-soft);
   --chart-4: var(--color-border-strong);
-  --chart-5: var(--color-surface-section);
+  --chart-5: var(--surface-section);
 
-  --sidebar: var(--color-surface-panel);
-  --sidebar-foreground: var(--color-ink-strong);
-  --sidebar-primary: var(--color-brand-wine);
-  --sidebar-primary-foreground: var(--color-surface-base);
-  --sidebar-accent: var(--color-surface-base);
-  --sidebar-accent-foreground: var(--color-brand-wine);
+  --sidebar: var(--surface-panel);
+  --sidebar-foreground: var(--ink-strong);
+  --sidebar-primary: var(--brand-wine);
+  --sidebar-primary-foreground: var(--surface-base);
+  --sidebar-accent: var(--surface-base);
+  --sidebar-accent-foreground: var(--brand-wine);
   --sidebar-border: var(--color-border-subtle);
-  --sidebar-ring: var(--color-brand-wine);
+  --sidebar-ring: var(--brand-wine);
 
   /* Sistema tipográfico — fallbacks; next/font sobrescreve no <body>.
      Display: Marcellus (Optima-like) · Corpo/UI: DM Sans (inspiração Boty) ·
@@ -173,44 +173,78 @@
 }
 
 .dark {
-  --color-ink-strong: #fffde9;
-  --color-ink-soft: #f5e5d0;
-  --color-ink-muted: #c9b3a0;
-  --color-surface-base: #2e0b12;
-  --color-surface-section: #3a1018;
-  --color-surface-panel: #47131c;
-  --color-surface-contrast: #2e0b12;
+  --ink-strong: #fffde9;
+  --ink-soft: #f5e5d0;
+  --ink-muted: #c9b3a0;
+  --surface-base: #2e0b12;
+  --surface-section: #3a1018;
+  --surface-panel: #47131c;
+  --surface-contrast: #2e0b12;
   --color-border-subtle: #5a2a33;
   --color-border-strong: #7a3a45;
   --color-overlay-soft: rgba(255, 253, 233, 0.06);
   --color-overlay-strong: rgba(20, 4, 8, 0.82);
 
-  --background: var(--color-surface-base);
-  --foreground: var(--color-ink-strong);
-  --card: var(--color-surface-panel);
-  --card-foreground: var(--color-ink-strong);
-  --popover: var(--color-surface-panel);
-  --popover-foreground: var(--color-ink-strong);
-  --primary: var(--color-brand-pink);
-  --primary-foreground: var(--color-brand-wine);
-  --secondary: var(--color-brand-wine);
-  --secondary-foreground: var(--color-brand-pink);
+  --background: var(--surface-base);
+  --foreground: var(--ink-strong);
+  --card: var(--surface-panel);
+  --card-foreground: var(--ink-strong);
+  --popover: var(--surface-panel);
+  --popover-foreground: var(--ink-strong);
+  --primary: var(--brand-pink);
+  --primary-foreground: var(--brand-wine);
+  --secondary: var(--brand-wine);
+  --secondary-foreground: var(--brand-pink);
   --accent: #5a2a33;
-  --accent-foreground: var(--color-brand-pink);
+  --accent-foreground: var(--brand-pink);
   --muted: #3a1018;
-  --muted-foreground: var(--color-ink-muted);
+  --muted-foreground: var(--ink-muted);
   --border: var(--color-border-subtle);
   /* O campo é `bg-transparent` no tema claro: a borda é a ÚNICA coisa que
    * marca onde se clica para digitar. Com `--color-border-strong` dava
    * 1,58:1 contra o fundo — reprovava o mínimo de 3:1 da WCAG 1.4.11 e,
-   * na prática, sumia. `--color-ink-muted` dá 4,81:1 no claro e 8,90:1 no
+   * na prática, sumia. `--ink-muted` dá 4,81:1 no claro e 8,90:1 no
    * escuro, e já é da paleta: não inventa cor.
    * Guardado por `src/test/contrast-aa.test.ts`. */
-  --input: var(--color-ink-muted);
-  --ring: var(--color-brand-pink);
+  --input: var(--ink-muted);
+  --ring: var(--brand-pink);
 }
 
 @theme inline {
+  /* ── CORES DE MARCA ────────────────────────────────────────────────
+   * Registradas aqui, e não só no `:root`, porque o Tailwind v4 só monta
+   * o modificador de opacidade (`/80`, `/10`) para cor que ele conhece.
+   * Enquanto estas famílias viviam só no `:root` com utilitário escrito
+   * à mão, **156 classes não geravam CSS nenhum**: 126 propriedades que
+   * simplesmente não eram aplicadas e 30 estados de `hover:`/`focus:`
+   * que não aconteciam. `bg-brand-wine/80` não era 80% de vinho — era
+   * nada. Diagnóstico completo em `src/lib/design/CLAUDE.md` §7.2.
+   *
+   * O valor de runtime mora em `--<nome>` (sem o prefixo `--color-`) no
+   * `:root` e no `.dark`; aqui só se aponta para ele. O prefixo não pode
+   * se repetir dos dois lados — `--color-x: var(--color-x)` é circular.
+   *
+   * O `@theme inline` **emite** estas variáveis no `:root` do CSS final,
+   * então `var(--color-brand-wine)` continua resolvendo para quem usa a
+   * forma longa (há dois casos em `style` inline de componente).
+   *
+   * Guardado por `src/test/opacidade-de-cor.test.ts`. */
+  --color-brand-wine: var(--brand-wine);
+  --color-brand-wine-soft: var(--brand-wine-soft);
+  --color-brand-wine-deep: var(--brand-wine-deep);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-pink-soft: var(--brand-pink-soft);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-light: var(--brand-gold-light);
+  --color-brand-gold-deep: var(--brand-gold-deep);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-surface-base: var(--surface-base);
+  --color-surface-section: var(--surface-section);
+  --color-surface-panel: var(--surface-panel);
+  --color-surface-contrast: var(--surface-contrast);
+
   /* ── ESCALA DE ESPAÇAMENTO (8pt) ──────────────────────────────────
    * Das quatro famílias de token que o Design System Blueprint exige
    * — tipografia, cor, motion e espaçamento — esta era a única que não
@@ -314,11 +348,11 @@
 
   ::selection {
     background: rgba(71, 19, 28, 0.34);
-    color: var(--color-surface-base);
+    color: var(--surface-base);
   }
 
   :focus-visible {
-    outline: 1.5px solid var(--color-brand-wine);
+    outline: 1.5px solid var(--brand-wine);
     outline-offset: 2px;
   }
 
@@ -403,7 +437,7 @@
   }
 
   .eyebrow {
-    color: var(--color-ink-muted);
+    color: var(--ink-muted);
     font-family: var(--font-geist);
     font-size: 0.6875rem;
     font-weight: 500;
@@ -420,7 +454,7 @@
   }
 
   .section-label {
-    color: var(--color-ink-muted);
+    color: var(--ink-muted);
     font-family: var(--font-geist);
     font-size: 0.75rem;
     font-weight: 500;
@@ -442,81 +476,6 @@
 
   .text-negative {
     color: var(--color-negative);
-  }
-
-  .text-brand-gold {
-    color: var(--color-brand-wine);
-  }
-
-  .text-brand-gold-light {
-    color: var(--color-brand-pink);
-  }
-
-  .text-brand-gold-deep {
-    color: var(--color-brand-wine-deep);
-  }
-
-  .text-brand-wine {
-    color: var(--color-brand-wine);
-  }
-
-  .text-brand-pink {
-    color: var(--color-brand-pink);
-  }
-
-  /* SVG fill — as cores brand não estão no @theme, então as utilities fill
-     precisam ser declaradas à mão (igual às de text e bg). Usadas no coração
-     da wishlist. */
-  .fill-brand-wine {
-    fill: var(--color-brand-wine);
-  }
-
-  .fill-brand-pink {
-    fill: var(--color-brand-pink);
-  }
-
-  .text-ink-strong {
-    color: var(--color-ink-strong);
-  }
-
-  .text-ink-soft {
-    color: var(--color-ink-soft);
-  }
-
-  .text-ink-muted {
-    color: var(--color-ink-muted);
-  }
-
-  .text-surface-contrast {
-    color: var(--color-surface-contrast);
-  }
-
-  .bg-surface-base {
-    background-color: var(--color-surface-base);
-  }
-
-  .bg-surface-section {
-    background-color: var(--color-surface-section);
-  }
-
-  .bg-surface-panel {
-    background-color: var(--color-surface-panel);
-  }
-
-  .bg-surface-contrast {
-    background-color: var(--color-surface-contrast);
-  }
-
-  .bg-brand-gold {
-    background-color: var(--color-brand-wine);
-  }
-
-  .bg-brand-wine {
-    background-color: var(--color-brand-wine);
-  }
-
-  .bg-brand-pink {
-    background-color: var(--color-brand-pink);
   }
 
   .bg-scene-backdrop {
@@ -833,8 +792,8 @@
   }
 
   .loreal-surface {
-    background-color: var(--color-surface-section);
-    color: var(--color-ink-strong);
+    background-color: var(--surface-section);
+    color: var(--ink-strong);
   }
 
   .loreal-kicker {
@@ -897,7 +856,7 @@
 
   /* ── SEARCH PILL — ícone reage ao foco do campo ────────────── */
   .search-pill-form:focus-within .search-pill-icon {
-    color: var(--color-brand-wine);
+    color: var(--brand-wine);
     transform: translateY(-50%) scale(1.08);
   }
 
@@ -914,7 +873,7 @@
   }
 
   .input-underline:focus {
-    border-bottom-color: var(--color-brand-wine);
+    border-bottom-color: var(--brand-wine);
     outline: none;
   }
 
@@ -967,7 +926,7 @@
 
   /* Pílula uppercase (eyebrow) reutilizada em headers de página admin */
   .admin-eyebrow {
-    color: var(--color-brand-wine);
+    color: var(--brand-wine);
     font-family: var(--font-geist);
     font-size: 0.6875rem;
     font-weight: 500;
@@ -1109,14 +1068,14 @@
  * NÃO use text-brand-wine sobre bg-brand-wine (tom-sobre-tom).
  */
 .btn-wine {
-  background-color: var(--color-brand-wine);
-  color: var(--color-brand-pink);
+  background-color: var(--brand-wine);
+  color: var(--brand-pink);
   transition:
     background-color var(--duration-fast) ease-out,
     transform var(--duration-fast) ease-out;
 }
 .btn-wine:hover {
-  background-color: var(--color-brand-wine-deep);
+  background-color: var(--brand-wine-deep);
 }
 .btn-wine:active {
   transform: scale(0.97);
@@ -1125,25 +1084,25 @@
 .btn-ghost-wine {
   background-color: transparent;
   border: 1px solid rgba(71, 19, 28, 0.4);
-  color: var(--color-brand-wine);
+  color: var(--brand-wine);
   transition:
     border-color var(--duration-fast) ease-out,
     background-color var(--duration-fast) ease-out;
 }
 .btn-ghost-wine:hover {
-  border-color: var(--color-brand-wine);
+  border-color: var(--brand-wine);
   background-color: rgba(71, 19, 28, 0.06);
 }
 
 .btn-pink-on-wine {
-  background-color: var(--color-brand-pink);
-  color: var(--color-brand-wine);
+  background-color: var(--brand-pink);
+  color: var(--brand-wine);
   transition:
     background-color var(--duration-fast) ease-out,
     transform var(--duration-fast) ease-out;
 }
 .btn-pink-on-wine:hover {
-  background-color: var(--color-brand-pink-soft);
+  background-color: var(--brand-pink-soft);
 }
 
 /* ── MICRO-INTERAÇÕES ──────────────────────────────────────────── */
@@ -1153,7 +1112,7 @@
   outline: none;
 }
 .focus-ring:focus-visible {
-  outline: 2px solid var(--color-brand-wine);
+  outline: 2px solid var(--brand-wine);
   outline-offset: 2px;
 }
 

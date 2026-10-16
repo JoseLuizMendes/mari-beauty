@@ -27,14 +27,20 @@ function cssToken(name: string): string | null {
   return match ? match[1].toUpperCase() : null;
 }
 
+/**
+ * Os nomes perderam o prefixo `--color-` em 2026-10-16: o valor literal
+ * passou a morar em `--brand-wine` e o `--color-brand-wine` virou o ponteiro
+ * do `@theme inline` (`var(--brand-wine)`), que é o que faz o Tailwind gerar
+ * `bg-brand-wine/80`. Este teste lê o **literal**, então segue o valor.
+ */
 const MAPPING: Array<[keyof typeof ogPalette, string]> = [
-  ["wine", "color-brand-wine"],
-  ["wineSoft", "color-brand-wine-soft"],
-  ["wineDeep", "color-brand-wine-deep"],
-  ["pink", "color-brand-pink"],
-  ["pinkSoft", "color-brand-pink-soft"],
-  ["inkStrong", "color-ink-strong"],
-  ["inkSoft", "color-ink-soft"],
+  ["wine", "brand-wine"],
+  ["wineSoft", "brand-wine-soft"],
+  ["wineDeep", "brand-wine-deep"],
+  ["pink", "brand-pink"],
+  ["pinkSoft", "brand-pink-soft"],
+  ["inkStrong", "ink-strong"],
+  ["inkSoft", "ink-soft"],
 ];
 
 describe("ogPalette espelha globals.css", () => {
