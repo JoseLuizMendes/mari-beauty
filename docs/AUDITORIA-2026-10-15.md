@@ -242,13 +242,25 @@ promovidos ao índice global (ERR-2026-0020 a 0024) e constam acima quando aplic
 | 2 | Rate limit não distribuído | Contador atômico em Postgres | 🔥 Alta | ✅ **PR #22** (CI verde) |
 | 3 | 1,5 MB de PNG na vitrine | Gerar AVIF/WebP + `formats` no `next.config` | 🔥 Alta | ✅ **PR #20** (CI verde) |
 | 4 | Gateway de pagamento mock | Integrar provedor real atrás da porta existente | 🔥 Alta | ⏳ Decisão pendente (Mercado Pago × ASAAS) |
-| 5 | Contraste nunca verificado | Checagem automatizada dos pares de token no CI | 🟡 Média | Aberto |
-| 6 | Tokens de spacing ausentes | Declarar `--spacing-*` em `globals.css` e espelhar em `tokens.ts` | 🟡 Média | Aberto |
-| 7 | Hex hardcoded no 3D | Mapa de cores no domínio do frasco; manter o hex só na fronteira WebGL | 🟡 Média | Aberto |
-| 8 | Hex no `order-tracking-modal` | Trocar por token | 🟢 Baixa | Aberto |
-| 9 | Regra de negócio no `checkout/route.ts` | Extrair para `orders/application/` | 🟡 Média | Aberto |
-| 10 | Sem orçamento de performance no CI | Lighthouse CI ou verificação de bundle | 🟡 Média | Aberto |
+| 5 | Contraste nunca verificado | Checagem automatizada dos pares de token no CI | 🟡 Média | ✅ **PR #28**. Os 7 pares de texto passam nos dois temas; `--input` reprova 1.4.11 (1,58:1) e espera a paleta final |
+| 6 | Tokens de spacing ausentes | Declarar `--spacing-*` em `globals.css` | 🟡 Média | ✅ **PR #27**. Nomes semânticos, não numéricos — `--spacing-1` sequestraria o `p-1` em 1.038 lugares. Não espelhado em `tokens.ts`: aquele arquivo não era a fonte que a doc dizia ser |
+| 7 | Hex hardcoded no 3D | Mapa de cores no domínio do frasco; manter o hex só na fronteira WebGL | 🟡 Média | ✅ **PR #30**. Eram 2 (não 4), e o mesmo valor duplicado entre a página e a cena — que precisam ser idênticos porque o vidro refrata. Virou token + `scene-palette.ts` + teste de espelho |
+| 8 | Hex no `order-tracking-modal` | Trocar por token | 🟢 Baixa | ✅ **PR #30**. O `style` inline sobrescrevia o token que o `className` já usava |
+| 9 | Regra de negócio no `checkout/route.ts` | Extrair para `orders/application/` | 🟡 Média | ✅ **PR #32**. 233 → 72 linhas. `place-order.ts` (use case) + `checkout-pricing.ts` (puro) + `ordersRepository.criarPedido` |
+| 10 | Sem orçamento de performance no CI | Lighthouse CI ou verificação de bundle | 🟡 Média | ✅ **PR #29**. Verificação de bundle, não Lighthouse — browser vira flake e gate que falha sozinho é desligado. Quebra o build |
 | 11 | 3 agentes não cobrem e-commerce | Documento ou seção de aplicação no cofre | 🟡 Média | Aberto (repo `dev`) |
+
+### Achados que a execução dos itens 5–10 revelou
+
+Nenhum deles estava na auditoria — apareceram ao corrigir os que estavam.
+
+| Achado | Onde ficou registrado |
+| --- | --- |
+| **165 classes de opacidade não geram CSS** (`bg-brand-wine/80` é *nada*, não 80%). As famílias `brand-*`, `ink-*` e `surface-*` estão fora do `@theme`, e o Tailwind v4 só monta `/NN` para cor registrada | `src/lib/design/CLAUDE.md` §7.2 — **aberto**, exige revisão visual |
+| **`tokens.ts` não era a fonte de cor** que quatro `CLAUDE.md` mandavam usar: era a paleta pré-rebrand em OKLCH, 10 dos 11 exports sem consumidor | §7.1; os 10 apagados no PR #31 |
+| **O E2E travava 60s** por reencode de PNG de 1,5MB no `/_next/image`, não pela URL morta do Cloudinary como se supunha | `e2e/CLAUDE.md` #8 |
+| **Apagar código morto derrubou a cobertura** — literais contavam como cobertos por serem avaliados no import. O gate pedia para não limpar | `vitest.config.ts`; resolvido cobrindo o modal de rastreamento (0% → suíte de 18 testes) |
+| **`claude-md-paths.test.ts` não verifica prosa**, só caminhos. Foi assim que as afirmações falsas sobre `tokens.ts` sobreviveram ao teste que existia para pegar exatamente esse apodrecimento | §7.1 |
 
 ---
 

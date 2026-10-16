@@ -71,6 +71,7 @@ Cada domínio é uma pasta em `src/lib/<dominio>/`. A profundidade de camadas
 | `cn()` (merge de classes)  | `src/shadcn-utils/utils.ts`                                         |
 | Auth do admin (Edge-safe)  | `src/lib/auth/presentation/admin-auth.ts`                           |
 | Confirmação de pagamento   | `src/lib/orders/application/confirm-payment.ts`                     |
+| Regra do checkout          | `src/lib/orders/application/place-order.ts`                         |
 
 ## 4. Scripts (sempre via pnpm)
 
@@ -135,7 +136,11 @@ O schema tem dois níveis:
 - `admin-auth.ts` roda no **Edge runtime**: só pode depender de `jose`.
   Nada de bcrypt, otplib, prisma ou arctic nesse módulo.
 - **Nunca confiar em preço, estoque ou cupom vindo do client.** Re-validar
-  no servidor via Prisma (ver `src/app/api/checkout/route.ts`).
+  no servidor via Prisma — a conta está em
+  [`src/lib/orders/domain/checkout-pricing.ts`](src/lib/orders/domain/checkout-pricing.ts)
+  e a orquestração em
+  [`src/lib/orders/application/place-order.ts`](src/lib/orders/application/place-order.ts).
+  O handler só faz Zod e status.
 - Toda entrada externa passa por **Zod** (`src/lib/shared/domain/zod-schemas.ts`).
 - **Rota pública nova entra com rate limit e, se for formulário, honeypot.**
   - Limites em `src/lib/shared/infrastructure/rate-limit.ts`; aplicar com

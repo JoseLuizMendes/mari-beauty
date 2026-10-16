@@ -1,25 +1,20 @@
 /**
  * /api/checkout — POST
  * ─────────────────────────────────────────────────────────────────────
- * Cria um Order persistido no banco a partir dos dados do form + cart.
+ * Fronteira HTTP e nada além disso: valida o corpo com Zod, chama o use
+ * case e traduz o resultado em status.
  *
- * Fluxo:
- *  1. Valida payload com checkoutSchema (Zod)
- *  2. Busca produtos via Prisma (revalida preços — NUNCA confia no client)
- *  3. Calcula subtotal, aplica cupom (se houver), calcula frete via UF
- *  4. Chama payment-provider (mock por enquanto) → recebe paymentId/status
- *  5. Cria Order + OrderItems em transação atômica
- *  6. Atualiza stock dos produtos + usedCount do cupom
- *  7. Retorna { orderId } para o client redirecionar pra /sucesso/[id]
+ * A regra de negócio vive em
+ * [`placeOrder`](../../../lib/orders/application/place-order.ts) — este
+ * arquivo tinha 233 linhas com `prisma.$transaction`, cálculo de frete e
+ * chamada de gateway no meio, contra o `CLAUDE.md` da raiz ("não espalhe
+ * regra em route handler") e o do contexto `orders` ("o único arquivo do
+ * contexto que conhece o Prisma é o repositório").
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/shared/infrastructure/prisma-client";
 import { checkoutSchema } from "@/lib/shared/domain/zod-schemas";
-import { validateCoupon } from "@/lib/coupons/infrastructure/persistence/coupons-repository";
-import { getShippingCostByState } from "@/lib/shipping/infrastructure/external/shipping";
-import { createPayment } from "@/lib/payment/infrastructure/external/payment-provider";
-import { confirmPayment } from "@/lib/orders/application/confirm-payment";
+import { placeOrder } from "@/lib/orders/application/place-order";
 import { z } from "zod";
 
 // ─── Schema do body ──────────────────────────────────────────────────────────
@@ -40,183 +35,27 @@ const checkoutBodySchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const parsed = checkoutBodySchema.safeParse(body);
+    const parsed = checkoutBodySchema.safeParse(await req.json());
 
     if (!parsed.success) {
       return NextResponse.json(
-        {
-          error: "Dados inválidos",
-          issues: parsed.error.flatten(),
-        },
+        { error: "Dados inválidos", issues: parsed.error.flatten() },
         { status: 400 },
       );
     }
 
-    const { customer, address, items, couponCode } = parsed.data;
-    const productIds = items.map((i) => i.productId);
+    const resultado = await placeOrder(parsed.data);
 
-    // ── 1. Busca produtos no banco (revalida preços e estoque) ──────────────
-    const products = await prisma.product.findMany({
-      where: { id: { in: productIds } },
-    });
-
-    if (products.length !== productIds.length) {
-      return NextResponse.json(
-        { error: "Um ou mais produtos não foram encontrados" },
-        { status: 400 },
-      );
-    }
-
-    // Cria mapa para lookup rápido + valida estoque
-    const productMap = new Map(products.map((p) => [p.id, p]));
-    for (const item of items) {
-      const p = productMap.get(item.productId);
-      if (!p) continue;
-      if (p.stock < item.quantity) {
-        return NextResponse.json(
-          {
-            error: `Estoque insuficiente para "${p.name}" (disponível: ${p.stock})`,
-          },
-          { status: 400 },
-        );
-      }
-    }
-
-    // ── 2. Calcula subtotal server-side ─────────────────────────────────────
-    const subtotal = items.reduce((acc, item) => {
-      const product = productMap.get(item.productId);
-      if (!product) return acc;
-      return acc + Number(product.price) * item.quantity;
-    }, 0);
-
-    // ── 3. Aplica cupom (se houver) ─────────────────────────────────────────
-    let discount = 0;
-    let appliedCouponCode: string | null = null;
-    if (couponCode && couponCode.trim()) {
-      const result = await validateCoupon(couponCode, subtotal);
-      if (result.valid) {
-        discount = result.discount;
-        appliedCouponCode = result.code ?? null;
-      } else {
-        return NextResponse.json(
-          { error: result.message ?? "Cupom inválido" },
-          { status: 400 },
-        );
-      }
-    }
-
-    // ── 4. Calcula frete pela UF ────────────────────────────────────────────
-    const subtotalAfterDiscount = subtotal - discount;
-    const shippingCost = getShippingCostByState(
-      address.state,
-      subtotalAfterDiscount,
-    );
-
-    const total = subtotalAfterDiscount + shippingCost;
-
-    // ── 5. Cria Order + OrderItems + atualiza stock/cupom em transação ──────
-    const order = await prisma.$transaction(async (tx) => {
-      // Cria o pedido (sem itens primeiro pra ter o ID)
-      const newOrder = await tx.order.create({
-        data: {
-          status: "PENDING", // será atualizado para PAYMENT_CONFIRMED após o pagamento
-          customerName: customer.name,
-          customerEmail: customer.email,
-          customerPhone: customer.phone,
-          customerCpf: customer.cpf,
-          addressCep: address.cep,
-          addressStreet: address.street,
-          addressNumber: address.number,
-          addressComplement: address.complement ?? null,
-          addressNeighborhood: address.neighborhood,
-          addressCity: address.city,
-          addressState: address.state,
-          subtotal,
-          shippingCost,
-          discount,
-          total,
-          couponCode: appliedCouponCode,
-          items: {
-            create: items.map((item) => {
-              const product = productMap.get(item.productId)!;
-              return {
-                productId: product.id,
-                productName: product.name,
-                productSlug: product.slug,
-                category: product.category,
-                imageUrl: product.images[0] ?? "",
-                price: product.price,
-                quantity: item.quantity,
-              };
-            }),
-          },
-        },
-        include: { items: true },
-      });
-
-      // Decrementa stock e incrementa totalSold de cada produto
-      for (const item of items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: {
-            stock: { decrement: item.quantity },
-            totalSold: { increment: item.quantity },
-            seasonalSold: { increment: item.quantity },
-          },
-        });
-      }
-
-      // Incrementa uso do cupom
-      if (appliedCouponCode) {
-        await tx.coupon.update({
-          where: { code: appliedCouponCode },
-          data: { usedCount: { increment: 1 } },
-        });
-      }
-
-      return newOrder;
-    });
-
-    // ── 6. Chama payment provider (MOCK — em produção é Mercado Pago) ───────
-    const payment = await createPayment({
-      orderId: order.id,
-      amount: total,
-      customerName: customer.name,
-      customerEmail: customer.email,
-      customerCpf: customer.cpf,
-    });
-
-    // ── 7. Aplica regra de negócio se aprovado, ou só salva metadados ──────
-    // approved → use case orquestra PAYMENT_CONFIRMED + PREPARING (idempotente).
-    // pending/rejected → apenas persiste o paymentId para futuro webhook.
-    let finalStatus: "PREPARING" | "PENDING";
-
-    if (payment.status === "approved") {
-      await confirmPayment({
-        orderId: order.id,
-        paymentId: payment.paymentId,
-        mpStatus: payment.status,
-        paymentMethod: payment.paymentMethod,
-        source: "checkout",
-      });
-      finalStatus = "PREPARING";
-    } else {
-      await prisma.order.update({
-        where: { id: order.id },
-        data: {
-          mpPaymentId: payment.paymentId,
-          mpStatus: payment.status,
-          paymentMethod: payment.paymentMethod,
-        },
-      });
-      finalStatus = "PENDING";
+    // Toda recusa do domínio é 400: são todas culpa do pedido (produto
+    // sumiu, estoque acabou, cupom não vale), não do servidor.
+    if (!resultado.ok) {
+      return NextResponse.json({ error: resultado.mensagem }, { status: 400 });
     }
 
     return NextResponse.json({
-      orderId: order.id,
-      status: finalStatus,
-      paymentMethod: payment.paymentMethod,
+      orderId: resultado.orderId,
+      status: resultado.status,
+      paymentMethod: resultado.paymentMethod,
     });
   } catch (error) {
     console.error("[/api/checkout] Erro:", error);

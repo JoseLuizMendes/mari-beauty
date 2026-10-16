@@ -9,6 +9,42 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/shared/infrastructure/prisma-client";
 import type { OrderStatus } from "../../domain/order-types";
 
+/** Uma linha de `OrderItem`, já com o preço congelado do catálogo. */
+export interface ItemDoPedido {
+  productId: string;
+  productName: string;
+  productSlug: string;
+  category: string;
+  imageUrl: string;
+  price: number;
+  quantity: number;
+}
+
+export interface CriarPedidoInput {
+  cliente: {
+    name: string;
+    email: string;
+    phone: string;
+    cpf: string;
+  };
+  endereco: {
+    cep: string;
+    street: string;
+    number: string;
+    complement?: string | null;
+    neighborhood: string;
+    city: string;
+    state: string;
+  };
+  itens: ItemDoPedido[];
+  subtotal: number;
+  frete: number;
+  desconto: number;
+  total: number;
+  /** Código já validado, ou `null` quando não houve cupom. */
+  cupom: string | null;
+}
+
 export interface ApplyPaymentConfirmationInput {
   orderId: string;
   paymentId: string;
@@ -66,6 +102,84 @@ export const ordersRepository = {
    * transação atômica. Persiste dois OrderEvents (com `auto: true` no
    * segundo para marcar transição derivada).
    */
+  /**
+   * Cria o pedido com os itens, debita estoque e consome o cupom — numa
+   * transação só.
+   *
+   * Estava escrito à mão dentro do `POST /api/checkout`, que é o único
+   * lugar do app onde o `prisma` era tocado fora deste arquivo, contra a
+   * regra do `CLAUDE.md` deste contexto ("o único arquivo do contexto que
+   * conhece o Prisma").
+   *
+   * Os três passos são **uma** transação porque pedido criado sem estoque
+   * debitado vende o que não existe, e estoque debitado sem pedido criado
+   * some com a mercadoria. O cupom entra junto pelo mesmo motivo.
+   */
+  criarPedido(input: CriarPedidoInput) {
+    return prisma.$transaction(async (tx) => {
+      const pedido = await tx.order.create({
+        data: {
+          status: "PENDING",
+          customerName: input.cliente.name,
+          customerEmail: input.cliente.email,
+          customerPhone: input.cliente.phone,
+          customerCpf: input.cliente.cpf,
+          addressCep: input.endereco.cep,
+          addressStreet: input.endereco.street,
+          addressNumber: input.endereco.number,
+          addressComplement: input.endereco.complement ?? null,
+          addressNeighborhood: input.endereco.neighborhood,
+          addressCity: input.endereco.city,
+          addressState: input.endereco.state,
+          subtotal: input.subtotal,
+          shippingCost: input.frete,
+          discount: input.desconto,
+          total: input.total,
+          couponCode: input.cupom,
+          items: { create: input.itens },
+        },
+        include: { items: true },
+      });
+
+      for (const item of input.itens) {
+        await tx.product.update({
+          where: { id: item.productId },
+          data: {
+            stock: { decrement: item.quantity },
+            totalSold: { increment: item.quantity },
+            seasonalSold: { increment: item.quantity },
+          },
+        });
+      }
+
+      if (input.cupom) {
+        await tx.coupon.update({
+          where: { code: input.cupom },
+          data: { usedCount: { increment: 1 } },
+        });
+      }
+
+      return pedido;
+    });
+  },
+
+  /** Grava só os metadados do gateway, sem transitar de status. */
+  registrarTentativaDePagamento(input: {
+    orderId: string;
+    paymentId: string;
+    mpStatus: string;
+    paymentMethod: string;
+  }) {
+    return prisma.order.update({
+      where: { id: input.orderId },
+      data: {
+        mpPaymentId: input.paymentId,
+        mpStatus: input.mpStatus,
+        paymentMethod: input.paymentMethod,
+      },
+    });
+  },
+
   applyPaymentConfirmation(input: ApplyPaymentConfirmationInput) {
     return prisma.$transaction(async (tx) => {
       await tx.order.update({
