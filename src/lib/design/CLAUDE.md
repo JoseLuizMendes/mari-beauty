@@ -25,8 +25,7 @@ escopo: "Bounded context Design — tokens visuais (OKLCH palette, tipografia, e
 - Perfil paramétrico do frasco 3D (`bottle-profile.ts`)
 - Cor da cena 3D (`scene-palette.ts`) — espelho de `--color-scene-backdrop`
 - Aritmética de contraste WCAG (`contrast.ts`)
-- `tokens.ts` — material de referência do estudo de design; **não** é a
-  paleta em uso (ver §7.1)
+- `tokens.ts` — **só tokens de motion do GSAP** (ver §7.1)
 
 > ⚠️ **A paleta Mari Beauty não vive aqui.** Ela vive em
 > [`src/app/globals.css`](../../app/globals.css): wine `#47131C`, rosé
@@ -40,7 +39,7 @@ escopo: "Bounded context Design — tokens visuais (OKLCH palette, tipografia, e
 ```
 src/lib/design/
 ├── domain/
-│   ├── tokens.ts           # ex-`src/lib/design-tokens.ts` — ver §7.1
+│   ├── tokens.ts           # motion do GSAP, e só — ver §7.1
 │   ├── bottle-profile.ts   # frasco 3D como dado — spec 001
 │   ├── scene-palette.ts    # hex da cena 3D (WebGL não lê var())
 │   └── contrast.ts         # razão de contraste WCAG — aritmética pura
@@ -77,8 +76,7 @@ Sem `application/`/`infrastructure/`/`presentation/`: design tokens não têm re
 
 ## 5. Testes
 
-- `tokens.ts`: sem suite dedicada — valores literais, e hoje quase todos
-  sem consumidor (§7.1).
+- `tokens.ts`: sem suite dedicada — são valores literais de motion.
 - `bottle-profile.ts`: `src/test/bottle-profile.test.ts` cobre as invariantes de geometria (líquido dentro da cavidade, tampa no topo, raio limitado).
 - `scene-palette.ts`: `src/test/scene-palette.test.ts` — espelho do
   `globals.css` **e** existência do utilitário `.bg-scene-backdrop`.
@@ -123,9 +121,65 @@ teria enterrado um token novo num arquivo que ninguém lê.
 — e o `claude-md-paths.test.ts` diz explicitamente que não pega prosa. Os
 caminhos continuam verificados; as **afirmações** não.
 
-**O que NÃO foi feito aqui:** apagar os 10 exports mortos. É material do
-estudo de referência (Byredo/Aesop/MFK/L'Oréal) e a decisão de descartar ou
-reaproveitar é do dev, não de quem passou por aqui corrigindo hex.
+**Os dez foram apagados** (decisão do dev, 2026-10-16). O arquivo caiu de
+327 para 72 linhas e hoje é o que o nome nunca disse: tokens de motion do
+GSAP.
+
+`motion` ficou em TS, e não no `globals.css`, por motivo técnico: o GSAP
+precisa de **número** (`duration: 0.8`) e do nome de easing dele
+(`power4.out`), não de string CSS.
+
+⚠️ O `globals.css` tem o próprio conjunto de motion para transições CSS
+(`--ease-smooth/shift/soft`, `--duration-fast/base/slow`). Os valores se
+sobrepõem em parte e os nomes **não** combinam — `--duration-base: 0.8s` é
+o `slow: 0.8` do TS. São dois conjuntos; em CSS, manda o de CSS. Unificar a
+nomenclatura é trabalho à parte, não feito aqui.
+
+---
+
+## 7.2 ⚠️ 165 classes de opacidade que não geram CSS
+
+Medido em 2026-10-16, no CSS do build.
+
+No Tailwind v4, o modificador de opacidade (`/80`, `/10`) só existe para
+cor **registrada no `@theme`**. As famílias `--color-brand-*`,
+`--color-ink-*` e `--color-surface-*` estão em `:root` puro, e os
+utilitários delas são **escritos à mão** no `@layer utilities` — 23 regras
+que cobrem só a forma simples.
+
+Resultado: `bg-brand-wine/80` não gera regra nenhuma. Não é "80% de wine" —
+é **nada**. O build confirma: zero seletores com barra escapada para essas
+três famílias, enquanto `.bg-muted\/50` e `.border-border\/40` existem
+normalmente, porque `muted` e `border` estão no `@theme inline`.
+
+| Família                       | Classes com `/NN` no `src/` |
+| ----------------------------- | --------------------------- |
+| `bg-brand-wine/NN`            | 53                          |
+| `text-brand-pink/NN`          | 32                          |
+| `bg-brand-pink/NN`            | 19                          |
+| `border-brand-wine/NN`        | 17                          |
+| `border-brand-pink/NN`        | 10                          |
+| `text-brand-wine/NN`          | 9                           |
+| outras (`ink-*`, `surface-*`) | 25                          |
+| **total**                     | **165**                     |
+
+### A correção, e por que não está neste PR
+
+Registrar as três famílias no `@theme inline` resolve tudo de uma vez — e
+aí os 23 utilitários à mão viram redundantes e saem. Há um detalhe: não dá
+para escrever `@theme inline { --color-ink-strong: var(--color-ink-strong) }`,
+que é circular. Os nomes de runtime precisam mudar (`--ink-strong`), como o
+shadcn já faz neste mesmo arquivo com `--foreground`/`--color-foreground`.
+As ~88 referências `var(--color-X-*)` **continuam funcionando** sem
+alteração, porque o Tailwind emite os tokens do `@theme` no `:root`. O que
+muda é a definição, o `.dark`, e o mapeamento dos dois testes de espelho
+(`og-palette.test.ts`, `scene-palette.test.ts`), que leem hex literal do
+CSS.
+
+**O que trava:** no dia em que isso entrar, 165 regras de translucidez
+passam a valer de uma vez, em páginas onde nunca valeram. É mudança visual
+no site inteiro e precisa de olho humano no preview — não cabe de carona
+num PR sobre hex e cinza.
 
 ---
 

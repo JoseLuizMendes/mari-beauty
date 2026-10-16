@@ -36,10 +36,16 @@ Padrão de composição: **Server faz fetch e passa dados como prop** para um
 
 ## 3. Estilo visual
 
-1. **Design tokens** vivem em [`@/lib/design/domain/tokens`](../lib/design/domain/tokens.ts)
-   - variáveis CSS em `src/app/globals.css`. **Nunca usar cor/espaçamento
-     hardcoded.** Use Tailwind tokens (`bg-primary`, `text-foreground`,
-     `border-border`) ou as classes oficiais do design system.
+1. **Cor vive em `src/app/globals.css`** — é a fonte. **Nunca usar
+   cor/espaçamento hardcoded.** Use token (`bg-primary`, `text-foreground`,
+   `border-border`, `bg-brand-wine`, `text-ink-muted`).
+   `@/lib/design/domain/tokens` tem **só motion do GSAP**, não cor.
+   ⚠️ **Não escreva `/NN` em cor de marca:** `bg-brand-wine/80`,
+   `text-brand-pink/60`, `bg-surface-base/90` **não geram CSS nenhum** —
+   não é 80% de wine, é nada. São 165 classes mortas já no `src/`. Opacidade
+   só funciona em cor registrada no `@theme`: `bg-muted/50`,
+   `border-border/40`, `bg-primary/10`. Ver §7.2 de
+   [`../lib/design/CLAUDE.md`](../lib/design/CLAUDE.md).
 2. **Paleta** é a Mari Beauty: wine (`#47131C`), rosé (`#FFD7E7`) e
    marfim (`#FFFDE9`), definida em `src/app/globals.css`. Os valores são
    **hex**, não OKLCH. Nunca hardcodar — use os tokens.
