@@ -76,12 +76,14 @@ export default defineConfig({
         // para 73 em vez de a cobertura ser recuperada. Ratchet só sobe.
         //
         // 2026-10-15 (PR do SEO): 73,31% → 74,72%. O bounded context `seo/`
-        // nasceu com 100% em domain. Piso subiu 73 → 74. Alvo seguinte: 75,
-        // o valor de onde ele nunca deveria ter saído.
-        statements: 74,
+        // nasceu com 100% em domain. Piso subiu 73 → 74.
+        //
+        // 2026-10-16 (escala de espaçamento): 74,88% → 75,13%. Piso sobe
+        // 74 → 75 — alcançado o valor de onde ele nunca deveria ter saído.
+        statements: 75,
         branches: 85,
-        functions: 81,
-        lines: 74,
+        functions: 82,
+        lines: 75,
       },
     },
   },

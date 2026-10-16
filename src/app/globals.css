@@ -5,30 +5,30 @@
 
 :root {
   /* Mari Beauty palette */
-  --color-brand-wine: #47131C;
-  --color-brand-wine-soft: #6B1F2C;
-  --color-brand-wine-deep: #2E0B12;
+  --color-brand-wine: #47131c;
+  --color-brand-wine-soft: #6b1f2c;
+  --color-brand-wine-deep: #2e0b12;
 
-  --color-brand-pink: #FFD7E7;
-  --color-brand-pink-soft: #FFE8F0;
+  --color-brand-pink: #ffd7e7;
+  --color-brand-pink-soft: #ffe8f0;
 
   /* Compat aliases — mantém usos existentes de brand-gold apontando para wine/pink */
   --color-brand-gold: var(--color-brand-wine);
   --color-brand-gold-light: var(--color-brand-pink);
   --color-brand-gold-deep: var(--color-brand-wine-deep);
 
-  --color-ink-strong: #2E0B12;
-  --color-ink-soft: #5A2A33;
+  --color-ink-strong: #2e0b12;
+  --color-ink-soft: #5a2a33;
   --color-ink-muted: #8a6770;
 
-  --color-surface-base: #FFFDE9;
-  --color-surface-section: #FFF3E8;
-  --color-surface-panel: #FFFFFF;
-  --color-surface-contrast: #FFFFFF;
+  --color-surface-base: #fffde9;
+  --color-surface-section: #fff3e8;
+  --color-surface-panel: #ffffff;
+  --color-surface-contrast: #ffffff;
 
-  --color-border-subtle: #F0E5D8;
-  --color-border-strong: #D9C9B8;
-  --color-border-brand: #47131C;
+  --color-border-subtle: #f0e5d8;
+  --color-border-strong: #d9c9b8;
+  --color-border-brand: #47131c;
 
   --color-overlay-soft: rgba(71, 19, 28, 0.08);
   --color-overlay-strong: rgba(71, 19, 28, 0.74);
@@ -96,7 +96,7 @@
   /* Raios suaves p/ cards arredondados (inspiração Boty). Nomes próprios para
      não colidir com os --radius-* registrados no @theme. */
   --radius-card-sm: 0.75rem; /* 12px */
-  --radius-card: 1.25rem;    /* 20px — card padrão */
+  --radius-card: 1.25rem; /* 20px — card padrão */
   --radius-card-lg: 1.75rem; /* 28px — cards grandes/editorial */
 
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
@@ -106,16 +106,28 @@
   --duration-base: 0.8s;
   --duration-slow: 1.2s;
 
-  --gradient-hero-noir: linear-gradient(160deg, #47131C 0%, #6B1F2C 100%);
-  --gradient-hero-gold: linear-gradient(135deg, #47131C 0%, #6B1F2C 62%, rgba(255, 215, 231, 0.45) 100%);
-  --gradient-card-soft: linear-gradient(145deg, #FFFDE9 0%, #FFE8F0 100%);
-  --gradient-section-warm: linear-gradient(180deg, #FFFDE9 0%, #FFE8F0 100%);
-  --gradient-brand-silk: linear-gradient(90deg, #FFD7E7 0%, #47131C 100%);
-  --gradient-image-overlay: linear-gradient(to top, rgba(71, 19, 28, 0.78) 0%, rgba(71, 19, 28, 0.32) 42%, rgba(71, 19, 28, 0) 66%);
+  --gradient-hero-noir: linear-gradient(160deg, #47131c 0%, #6b1f2c 100%);
+  --gradient-hero-gold: linear-gradient(
+    135deg,
+    #47131c 0%,
+    #6b1f2c 62%,
+    rgba(255, 215, 231, 0.45) 100%
+  );
+  --gradient-card-soft: linear-gradient(145deg, #fffde9 0%, #ffe8f0 100%);
+  --gradient-section-warm: linear-gradient(180deg, #fffde9 0%, #ffe8f0 100%);
+  --gradient-brand-silk: linear-gradient(90deg, #ffd7e7 0%, #47131c 100%);
+  --gradient-image-overlay: linear-gradient(
+    to top,
+    rgba(71, 19, 28, 0.78) 0%,
+    rgba(71, 19, 28, 0.32) 42%,
+    rgba(71, 19, 28, 0) 66%
+  );
 
   --shadow-hairline: 0 1px 0 var(--color-border-subtle);
-  --shadow-card: 0 2px 12px rgba(46, 11, 18, 0.06), 0 1px 4px rgba(46, 11, 18, 0.04);
-  --shadow-card-hover: 0 8px 28px rgba(46, 11, 18, 0.11), 0 2px 8px rgba(46, 11, 18, 0.06);
+  --shadow-card:
+    0 2px 12px rgba(46, 11, 18, 0.06), 0 1px 4px rgba(46, 11, 18, 0.04);
+  --shadow-card-hover:
+    0 8px 28px rgba(46, 11, 18, 0.11), 0 2px 8px rgba(46, 11, 18, 0.06);
   --shadow-gold: 0 4px 20px rgba(71, 19, 28, 0.24);
   --shadow-luxury: 0 24px 64px rgba(46, 11, 18, 0.12);
 
@@ -124,29 +136,33 @@
    * reservados para acentos e o "committed moment" de cada página.
    * Usados apenas dentro de /admin/*; não tocar nas surfaces públicas.
    */
-  --color-admin-canvas: oklch(0.965 0.008 47);        /* fundo geral do admin */
-  --color-admin-panel: oklch(0.99 0.004 60);          /* cards de conteúdo */
-  --color-admin-panel-soft: oklch(0.975 0.006 55);    /* zona secundária dentro de painel */
-  --color-admin-row-hover: oklch(0.95 0.012 47);      /* linhas de tabela em hover */
-  --color-admin-border: oklch(0.89 0.012 50);         /* hairline aquecido */
-  --color-admin-border-soft: oklch(0.93 0.008 50);    /* divisores internos */
+  --color-admin-canvas: oklch(0.965 0.008 47); /* fundo geral do admin */
+  --color-admin-panel: oklch(0.99 0.004 60); /* cards de conteúdo */
+  --color-admin-panel-soft: oklch(
+    0.975 0.006 55
+  ); /* zona secundária dentro de painel */
+  --color-admin-row-hover: oklch(0.95 0.012 47); /* linhas de tabela em hover */
+  --color-admin-border: oklch(0.89 0.012 50); /* hairline aquecido */
+  --color-admin-border-soft: oklch(0.93 0.008 50); /* divisores internos */
 
   /* Sombras "petal": quase invisíveis em repouso, ganham peso só em hover. */
   --shadow-petal-1: 0 1px 0 var(--color-admin-border);
-  --shadow-petal-2: 0 1px 2px rgba(46, 11, 18, 0.03), 0 8px 24px -12px rgba(46, 11, 18, 0.05);
-  --shadow-petal-3: 0 2px 4px rgba(46, 11, 18, 0.04), 0 12px 32px -10px rgba(46, 11, 18, 0.08);
+  --shadow-petal-2:
+    0 1px 2px rgba(46, 11, 18, 0.03), 0 8px 24px -12px rgba(46, 11, 18, 0.05);
+  --shadow-petal-3:
+    0 2px 4px rgba(46, 11, 18, 0.04), 0 12px 32px -10px rgba(46, 11, 18, 0.08);
 }
 
 .dark {
-  --color-ink-strong: #FFFDE9;
-  --color-ink-soft: #F5E5D0;
-  --color-ink-muted: #C9B3A0;
-  --color-surface-base: #2E0B12;
+  --color-ink-strong: #fffde9;
+  --color-ink-soft: #f5e5d0;
+  --color-ink-muted: #c9b3a0;
+  --color-surface-base: #2e0b12;
   --color-surface-section: #3a1018;
-  --color-surface-panel: #47131C;
-  --color-surface-contrast: #2E0B12;
-  --color-border-subtle: #5A2A33;
-  --color-border-strong: #7A3A45;
+  --color-surface-panel: #47131c;
+  --color-surface-contrast: #2e0b12;
+  --color-border-subtle: #5a2a33;
+  --color-border-strong: #7a3a45;
   --color-overlay-soft: rgba(255, 253, 233, 0.06);
   --color-overlay-strong: rgba(20, 4, 8, 0.82);
 
@@ -160,7 +176,7 @@
   --primary-foreground: var(--color-brand-wine);
   --secondary: var(--color-brand-wine);
   --secondary-foreground: var(--color-brand-pink);
-  --accent: #5A2A33;
+  --accent: #5a2a33;
   --accent-foreground: var(--color-brand-pink);
   --muted: #3a1018;
   --muted-foreground: var(--color-ink-muted);
@@ -170,6 +186,32 @@
 }
 
 @theme inline {
+  /* ── ESCALA DE ESPAÇAMENTO (8pt) ──────────────────────────────────
+   * Das quatro famílias de token que o Design System Blueprint exige
+   * — tipografia, cor, motion e espaçamento — esta era a única que não
+   * existia: o espaçamento vinha direto da escala numérica do Tailwind,
+   * sem nome e sem intenção.
+   *
+   * ⚠️ Os nomes são SEMÂNTICOS de propósito, nunca numéricos.
+   *
+   * No Tailwind v4 a escala numérica (`p-4`, `gap-2`) é derivada de um
+   * multiplicador único — `--spacing`, 0.25rem por padrão — enquanto o
+   * namespace `--spacing-*` gera utilitários NOMEADOS (`p-card`,
+   * `gap-block`). Um token chamado `--spacing-1` sequestraria o `p-1`
+   * já usado no projeto: são 1.038 utilitários numéricos espalhados por
+   * `src/`, e todos mudariam de valor em silêncio. Com nome semântico a
+   * colisão não existe, e o token ainda fica "nomeado pelo significado",
+   * como manda a §9 do Blueprint.
+   *
+   * O uso de cada passo vem da tabela de 8pt do próprio Blueprint.
+   */
+  --spacing-tight: 0.5rem; /* 8px  — ícone↔rótulo, inline apertado */
+  --spacing-control: 1rem; /* 16px — padding de controle, item de lista */
+  --spacing-card: 1.5rem; /* 24px — padding de card, blocos relacionados */
+  --spacing-block: 2rem; /* 32px — entre componentes de uma seção */
+  --spacing-section: 3rem; /* 48px — padding interno de seção */
+  --spacing-rhythm: 4rem; /* 64px — ritmo vertical entre seções */
+
   --font-sans: var(--font-dm-sans);
   --font-serif: var(--font-marcellus);
   --font-mono: var(--font-geist-mono);
@@ -617,27 +659,30 @@
 
   /* ── DIVIDERS (renomeados de gold → wine, mas classes mantidas) ── */
   .divider-gold {
-    background-color: rgba(71, 19, 28, 0.50);
+    background-color: rgba(71, 19, 28, 0.5);
   }
 
   .divider-gold-strong {
-    background-color: rgba(71, 19, 28, 0.60);
+    background-color: rgba(71, 19, 28, 0.6);
   }
 
   .dot-gold {
-    background-color: rgba(71, 19, 28, 0.50);
+    background-color: rgba(71, 19, 28, 0.5);
   }
 
   /* ── GRADIENTES HERO ────────────────────────────────────────── */
   .bg-hero-radial {
     background:
-      radial-gradient(120% 90% at 50% 100%, rgba(255, 215, 231, 0.28) 0%, transparent 55%),
+      radial-gradient(
+        120% 90% at 50% 100%,
+        rgba(255, 215, 231, 0.28) 0%,
+        transparent 55%
+      ),
       var(--gradient-hero-noir);
   }
 
   .product-glow {
-    filter:
-      drop-shadow(0 0 48px rgba(255, 215, 231, 0.28))
+    filter: drop-shadow(0 0 48px rgba(255, 215, 231, 0.28))
       drop-shadow(0 28px 48px rgba(46, 11, 18, 0.55));
   }
 
@@ -655,8 +700,8 @@
   .overlay-hero-teal {
     background: linear-gradient(
       to right,
-      rgba(8, 45, 45, 0.70) 0%,
-      rgba(8, 45, 45, 0.40) 40%,
+      rgba(8, 45, 45, 0.7) 0%,
+      rgba(8, 45, 45, 0.4) 40%,
       transparent 68%
     );
   }
@@ -664,7 +709,7 @@
     background: linear-gradient(
       to right,
       rgba(5, 2, 2, 0.55) 0%,
-      rgba(5, 2, 2, 0.20) 42%,
+      rgba(5, 2, 2, 0.2) 42%,
       transparent 68%
     );
   }
@@ -696,31 +741,35 @@
     background: linear-gradient(
       to right,
       rgba(255, 253, 233, 0.72) 0%,
-      rgba(255, 253, 233, 0.40) 40%,
+      rgba(255, 253, 233, 0.4) 40%,
       transparent 68%
     );
   }
 
   .bg-fade-bottom-soft {
-    background: linear-gradient(to top, rgba(46, 11, 18, 0.32), transparent 42%);
+    background: linear-gradient(
+      to top,
+      rgba(46, 11, 18, 0.32),
+      transparent 42%
+    );
   }
 
   /* ── LINHAS EDITORIAIS VERTICAIS ──────────────────────────── */
   .bg-line-gold-fade-in {
-    background: linear-gradient(to bottom, transparent, rgba(71, 19, 28, 0.40));
+    background: linear-gradient(to bottom, transparent, rgba(71, 19, 28, 0.4));
   }
 
   .bg-line-gold-fade-out {
-    background: linear-gradient(to bottom, rgba(71, 19, 28, 0.40), transparent);
+    background: linear-gradient(to bottom, rgba(71, 19, 28, 0.4), transparent);
   }
 
   /* ── TEXTO SOBRE FUNDO ESCURO ───────────────────────────────── */
   .text-dark-warm {
-    color: #FFE8F0;
+    color: #ffe8f0;
   }
 
   .text-dark-soft {
-    color: #F5D5DE;
+    color: #f5d5de;
   }
 
   /* ── HEADER GLASS BASE ─────────────────────────────────────── */
@@ -738,16 +787,16 @@
     background-color: rgba(255, 215, 231, 0.82);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border-bottom-color: rgba(71, 19, 28, 0.10);
+    border-bottom-color: rgba(71, 19, 28, 0.1);
   }
 
   /* ── ACENTOS POR COLEÇÃO ────────────────────────────────────── */
   .bg-accent-deep {
-    background-color: rgba(46, 11, 18, 0.60);
+    background-color: rgba(46, 11, 18, 0.6);
   }
 
   .bg-accent-mid {
-    background-color: rgba(71, 19, 28, 0.50);
+    background-color: rgba(71, 19, 28, 0.5);
   }
 
   .bg-accent-light {
@@ -831,7 +880,7 @@
 
   /* ── INPUT UNDERLINE ────────────────────────────────────────── */
   .input-underline {
-    border-bottom: 1px solid rgba(240, 229, 216, 0.60);
+    border-bottom: 1px solid rgba(240, 229, 216, 0.6);
     transition: border-bottom-color var(--duration-fast) ease-out;
   }
 
@@ -857,17 +906,35 @@
    * Vocabulário compartilhado por componentes em src/components/admin.
    * Nada aqui é usado nas rotas públicas.
    */
-  .bg-admin-canvas      { background-color: var(--color-admin-canvas); }
-  .bg-admin-panel       { background-color: var(--color-admin-panel); }
-  .bg-admin-panel-soft  { background-color: var(--color-admin-panel-soft); }
-  .hover\:bg-admin-row:hover { background-color: var(--color-admin-row-hover); }
+  .bg-admin-canvas {
+    background-color: var(--color-admin-canvas);
+  }
+  .bg-admin-panel {
+    background-color: var(--color-admin-panel);
+  }
+  .bg-admin-panel-soft {
+    background-color: var(--color-admin-panel-soft);
+  }
+  .hover\:bg-admin-row:hover {
+    background-color: var(--color-admin-row-hover);
+  }
 
-  .border-admin         { border-color: var(--color-admin-border); }
-  .border-admin-soft    { border-color: var(--color-admin-border-soft); }
+  .border-admin {
+    border-color: var(--color-admin-border);
+  }
+  .border-admin-soft {
+    border-color: var(--color-admin-border-soft);
+  }
 
-  .shadow-petal-1 { box-shadow: var(--shadow-petal-1); }
-  .shadow-petal-2 { box-shadow: var(--shadow-petal-2); }
-  .shadow-petal-3 { box-shadow: var(--shadow-petal-3); }
+  .shadow-petal-1 {
+    box-shadow: var(--shadow-petal-1);
+  }
+  .shadow-petal-2 {
+    box-shadow: var(--shadow-petal-2);
+  }
+  .shadow-petal-3 {
+    box-shadow: var(--shadow-petal-3);
+  }
 
   /* Pílula uppercase (eyebrow) reutilizada em headers de página admin */
   .admin-eyebrow {
@@ -909,8 +976,12 @@
 }
 
 @keyframes progress-fill {
-  from { width: 0%; }
-  to   { width: 100%; }
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 /* ── PAGE TRANSITIONS ─────────────────────────────────────────────
@@ -939,8 +1010,13 @@
 
 /* ── PULSE LENTO (badges Novo/Promoção) ──────────────────────────── */
 @keyframes pulse-slow {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.65; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.65;
+  }
 }
 
 .animate-pulse-slow {
@@ -949,7 +1025,8 @@
 
 /* ── TRACKING TIMELINE PULSE (etapa atual) ───────────────────── */
 @keyframes tracking-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 4px rgba(71, 19, 28, 0.12);
     transform: scale(1);
   }
@@ -969,8 +1046,12 @@
  * hover do trilho e respeita prefers-reduced-motion (vira estático).
  */
 @keyframes marquee-x {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee-x {
@@ -1001,7 +1082,9 @@
 .btn-wine {
   background-color: var(--color-brand-wine);
   color: var(--color-brand-pink);
-  transition: background-color var(--duration-fast) ease-out, transform var(--duration-fast) ease-out;
+  transition:
+    background-color var(--duration-fast) ease-out,
+    transform var(--duration-fast) ease-out;
 }
 .btn-wine:hover {
   background-color: var(--color-brand-wine-deep);
@@ -1012,9 +1095,11 @@
 
 .btn-ghost-wine {
   background-color: transparent;
-  border: 1px solid rgba(71, 19, 28, 0.40);
+  border: 1px solid rgba(71, 19, 28, 0.4);
   color: var(--color-brand-wine);
-  transition: border-color var(--duration-fast) ease-out, background-color var(--duration-fast) ease-out;
+  transition:
+    border-color var(--duration-fast) ease-out,
+    background-color var(--duration-fast) ease-out;
 }
 .btn-ghost-wine:hover {
   border-color: var(--color-brand-wine);
@@ -1024,7 +1109,9 @@
 .btn-pink-on-wine {
   background-color: var(--color-brand-pink);
   color: var(--color-brand-wine);
-  transition: background-color var(--duration-fast) ease-out, transform var(--duration-fast) ease-out;
+  transition:
+    background-color var(--duration-fast) ease-out,
+    transform var(--duration-fast) ease-out;
 }
 .btn-pink-on-wine:hover {
   background-color: var(--color-brand-pink-soft);
@@ -1043,7 +1130,9 @@
 
 /* Pill activatable que reage ao toque/click */
 .pill-press {
-  transition: transform var(--duration-fast) ease-out, background-color var(--duration-fast) ease-out;
+  transition:
+    transform var(--duration-fast) ease-out,
+    background-color var(--duration-fast) ease-out;
 }
 .pill-press:active {
   transform: scale(0.95);
