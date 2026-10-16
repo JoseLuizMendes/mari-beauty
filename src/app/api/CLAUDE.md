@@ -9,16 +9,16 @@
 
 ## 1. Rotas existentes
 
-| Rota | Método(s) | Propósito |
-| --- | --- | --- |
-| `/api/products` | GET | Listar produtos, filtrar por `?ids=` |
-| `/api/checkout` | POST | Criar Order, processar pagamento |
-| `/api/coupon/validate` | POST | Validar cupom server-side |
-| `/api/cep/[cep]` | GET | Proxy ViaCEP (cacheável) |
-| `/api/newsletter` | POST | Inscrever lead |
-| `/api/contact` | POST | Mensagem do form de contato |
-| `/api/reviews/[productId]` | GET, POST | Reviews do produto |
-| `/api/admin/cloudinary` | POST | Assinatura de upload (protegida) |
+| Rota                       | Método(s) | Propósito                            |
+| -------------------------- | --------- | ------------------------------------ |
+| `/api/products`            | GET       | Listar produtos, filtrar por `?ids=` |
+| `/api/checkout`            | POST      | Criar Order, processar pagamento     |
+| `/api/coupon/validate`     | POST      | Validar cupom server-side            |
+| `/api/cep/[cep]`           | GET       | Proxy ViaCEP (cacheável)             |
+| `/api/newsletter`          | POST      | Inscrever lead                       |
+| `/api/contact`             | POST      | Mensagem do form de contato          |
+| `/api/reviews/[productId]` | GET, POST | Reviews do produto                   |
+| `/api/admin/cloudinary`    | POST      | Assinatura de upload (protegida)     |
 
 ## 2. Esqueleto obrigatório
 
@@ -26,7 +26,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-const bodySchema = z.object({ /* ... */ });
+const bodySchema = z.object({
+  /* ... */
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,7 +37,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Payload inválido", issues: parsed.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
     // ... lógica via @/lib/*
@@ -52,11 +54,15 @@ export async function POST(req: NextRequest) {
 1. **Toda entrada externa passa por Zod.** Sem `as` em payload — sempre
    `safeParse` (ou `parse` em try/catch).
 2. **Preço, estoque, desconto sempre vêm do banco.** O client envia
-   `productId` + `quantity`; servidor recalcula tudo. Ver
-   [`checkout/route.ts`](checkout/route.ts).
+   `productId` + `quantity`; servidor recalcula tudo. A conta vive em
+   [`src/lib/orders/domain/checkout-pricing.ts`](../../lib/orders/domain/checkout-pricing.ts),
+   orquestrada por
+   [`place-order.ts`](../../lib/orders/application/place-order.ts) — **não**
+   no handler, que só faz Zod e status.
 3. **Transações Prisma** (`prisma.$transaction`) para qualquer mutação que
    toque múltiplas tabelas (Order + OrderItem + Product.stock +
-   Coupon.usedCount).
+   Coupon.usedCount). A transação mora no **repositório do contexto**, não
+   no handler: `ordersRepository.criarPedido`.
 4. **Status HTTP corretos**:
    - 200 sucesso GET, 201 criação, 204 sem corpo
    - 400 payload inválido, 401 não autenticado, 403 sem permissão
