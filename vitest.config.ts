@@ -80,10 +80,18 @@ export default defineConfig({
         //
         // 2026-10-16 (escala de espaçamento): 74,88% → 75,13%. Piso sobe
         // 74 → 75 — alcançado o valor de onde ele nunca deveria ter saído.
-        statements: 75,
-        branches: 85,
+        //
+        // 2026-10-16 (limpeza do tokens.ts): apagar os 10 exports mortos
+        // **derrubou** a cobertura para 74,56% e o gate pegou. Não é
+        // regressão de teste: eram ~207 linhas de literal que contavam como
+        // cobertas só porque importar o módulo as avalia. O piso não foi
+        // baixado — o `order-tracking-modal.tsx` (464 linhas, 0%, é o que o
+        // cliente abre para achar o pedido) ganhou suíte de comportamento e
+        // a cobertura foi para 78,33%. Piso sobe 75 → 78.
+        statements: 78,
+        branches: 87,
         functions: 82,
-        lines: 75,
+        lines: 78,
       },
     },
   },
