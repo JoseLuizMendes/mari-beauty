@@ -70,14 +70,22 @@ const HISTORICAL_MARKER =
 const EXTERNAL_PATHS = new Set(["tools/generate-claude-md.js"]);
 
 /**
- * Código gerado, que não existe em checkout limpo.
+ * Artefato gerado, que não existe em checkout limpo.
  *
  * `/src/generated` é gitignored (cliente do Prisma). O CI falhou aqui na
  * primeira rodada justamente por isso: a doc cita `@/generated/prisma`
  * corretamente, mas o diretório só passa a existir depois do generate — e
  * nem sempre nesse caminho. Caminho gerado não é responsabilidade da doc.
+ *
+ * `.next/` entrou pelo mesmo motivo, e o CI pegou do mesmo jeito: o
+ * `scripts/CLAUDE.md` cita `.next/build-manifest.json` ao explicar o
+ * orçamento de performance, o que está **certo** — é o arquivo que o script
+ * lê. Só que o job `unit` não builda, então o caminho não existe lá, e o
+ * teste passava na minha máquina só porque eu tinha acabado de buildar.
+ * Obrigar a doc a falar por rodeios para o teste passar seria piorar a doc
+ * para agradar a guarda.
  */
-const GENERATED_PREFIXES = ["@/generated", "src/generated"];
+const GENERATED_PREFIXES = ["@/generated", "src/generated", ".next"];
 
 /**
  * Convenções do App Router citadas como padrão, não como arquivo concreto.
