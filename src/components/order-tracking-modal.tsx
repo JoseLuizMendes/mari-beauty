@@ -309,12 +309,12 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
                     <div
                       className={`absolute left-[17px] top-[38px] w-[2px] h-[calc(100%-30px)] ${
                         isCancelled
-                          ? "bg-gray-200"
+                          ? "bg-border"
                           : isCompleted && !isCurrent
                             ? "bg-brand-wine/80"
                             : isCurrent
-                              ? "bg-gradient-to-b from-brand-wine/80 to-gray-200"
-                              : "bg-gray-200 bg-[length:2px_6px] bg-[repeating-linear-gradient(to_bottom,var(--color-ink-muted)_0,var(--color-ink-muted)_3px,transparent_3px,transparent_6px)]"
+                              ? "bg-gradient-to-b from-brand-wine/80 to-border"
+                              : "bg-border bg-[length:2px_6px] bg-[repeating-linear-gradient(to_bottom,var(--color-ink-muted)_0,var(--color-ink-muted)_3px,transparent_3px,transparent_6px)]"
                       }`}
                       style={
                         isPending
@@ -334,17 +334,17 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
                   <div
                     className={`relative z-10 flex-shrink-0 w-[36px] h-[36px] rounded-full flex items-center justify-center transition-all duration-300 ${
                       isCancelled
-                        ? "bg-gray-200"
+                        ? "bg-muted"
                         : isCompleted
                           ? isCurrent
                             ? "bg-brand-wine animate-tracking-pulse shadow-[0_0_0_4px_rgba(71,19,28,0.12)]"
                             : "bg-brand-wine"
-                          : "bg-gray-100 border-2 border-gray-200"
+                          : "bg-muted border-2 border-border"
                     }`}
                   >
                     {isCancelled ? (
                       <Icon
-                        className="h-4 w-4 text-gray-400"
+                        className="h-4 w-4 text-ink-muted"
                         strokeWidth={1.5}
                       />
                     ) : isCompleted ? (
@@ -361,7 +361,7 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
                       )
                     ) : (
                       <Icon
-                        className="h-4 w-4 text-gray-300"
+                        className="h-4 w-4 text-ink-muted"
                         strokeWidth={1.5}
                       />
                     )}
@@ -372,7 +372,7 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
                     <p
                       className={`text-sm font-medium leading-tight ${
                         isCancelled
-                          ? "text-gray-400"
+                          ? "text-ink-muted"
                           : isCompleted
                             ? "text-ink-strong"
                             : "text-ink-muted"
@@ -384,10 +384,10 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
                     <p
                       className={`text-xs mt-0.5 ${
                         isCancelled
-                          ? "text-gray-300"
+                          ? "text-ink-muted"
                           : isCompleted
                             ? "text-ink-soft"
-                            : "text-ink-muted/50"
+                            : "text-ink-muted"
                       }`}
                     >
                       {step.description}
@@ -404,7 +404,7 @@ export function OrderTrackingModal({ order }: { order: TrackingOrderData }) {
                     {step.key === "DELIVERED" &&
                       !isCompleted &&
                       !isCancelled && (
-                        <p className="text-[11px] text-ink-muted/60 mt-1.5 italic">
+                        <p className="text-[11px] text-ink-muted mt-1.5 italic">
                           Previsão: {formatEstimatedDate(estimatedDelivery)}
                         </p>
                       )}

@@ -24,9 +24,11 @@ escopo: "Camada Domain do bounded context design — tokens visuais puros"
 
 ## Conteúdo
 
-- `tokens.ts` — material de referência do estudo de design (OKLCH, paleta
-  antiga). **Não é a paleta em uso** e só o export `motion` tem consumidor
-  — ver §7.1 do `CLAUDE.md` de `src/lib/design/`.
+- `tokens.ts` — tokens de **motion do GSAP**, e só isso. Existe em TS
+  porque o GSAP quer número (`duration: 0.8`) e easing nomeado
+  (`power4.out`), não string CSS. Os outros 10 exports (cor em OKLCH,
+  tipografia, spacing…) eram da paleta pré-rebrand, não tinham consumidor
+  e foram apagados — ver §7.1 do `CLAUDE.md` de `src/lib/design/`.
 - `bottle-profile.ts` — perfil paramétrico do frasco 3D: tipos, perfil padrão derivado de `public/assets/hero1.png`, e as funções puras que derivam silhueta, volume de líquido e tampa. **Sem Three.js aqui** — quem vira malha é `src/components/bottle-3d/`.
 - `scene-palette.ts` — hex da cena 3D. Existe porque WebGL recebe string e
   desenha: `var(--color-scene-backdrop)` viraria preto. Espelha o
@@ -43,7 +45,7 @@ TypeScript puro.
 - `src/test/bottle-profile.test.ts` — invariantes do frasco.
 - `src/test/scene-palette.test.ts` — espelho do `globals.css`.
 - `src/test/contrast-aa.test.ts` — pares de contraste declarados no CSS.
-- `tokens.ts` não tem suite: são valores literais.
+- `tokens.ts` não tem suite: são valores literais de motion.
 
 ## Referências
 
