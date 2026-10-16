@@ -246,7 +246,7 @@ promovidos ao índice global (ERR-2026-0020 a 0024) e constam acima quando aplic
 | 6 | Tokens de spacing ausentes | Declarar `--spacing-*` em `globals.css` | 🟡 Média | ✅ **PR #27**. Nomes semânticos, não numéricos — `--spacing-1` sequestraria o `p-1` em 1.038 lugares. Não espelhado em `tokens.ts`: aquele arquivo não era a fonte que a doc dizia ser |
 | 7 | Hex hardcoded no 3D | Mapa de cores no domínio do frasco; manter o hex só na fronteira WebGL | 🟡 Média | ✅ **PR #30**. Eram 2 (não 4), e o mesmo valor duplicado entre a página e a cena — que precisam ser idênticos porque o vidro refrata. Virou token + `scene-palette.ts` + teste de espelho |
 | 8 | Hex no `order-tracking-modal` | Trocar por token | 🟢 Baixa | ✅ **PR #30**. O `style` inline sobrescrevia o token que o `className` já usava |
-| 9 | Regra de negócio no `checkout/route.ts` | Extrair para `orders/application/` | 🟡 Média | ✅ **PR #32**. 233 → 72 linhas. `place-order.ts` (use case) + `checkout-pricing.ts` (puro) + `ordersRepository.criarPedido` |
+| 9 | Regra de negócio no `checkout/route.ts` | Extrair para `orders/application/` | 🟡 Média | ✅ **PR #34**. 233 → 72 linhas. `place-order.ts` (use case) + `checkout-pricing.ts` (puro) + `ordersRepository.criarPedido` |
 | 10 | Sem orçamento de performance no CI | Lighthouse CI ou verificação de bundle | 🟡 Média | ✅ **PR #29**. Verificação de bundle, não Lighthouse — browser vira flake e gate que falha sozinho é desligado. Quebra o build |
 | 11 | 3 agentes não cobrem e-commerce | Documento ou seção de aplicação no cofre | 🟡 Média | Aberto (repo `dev`) |
 
