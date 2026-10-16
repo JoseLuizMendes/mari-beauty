@@ -111,7 +111,7 @@ export function BottleLabClient() {
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[1fr_360px]">
       {/* ── Palco ─────────────────────────────────────────────────────── */}
-      <div className="relative bg-[#0f5a58]">
+      <div className="relative bg-scene-backdrop">
         {showReference ? (
           <Image
             src="/assets/hero1.png"

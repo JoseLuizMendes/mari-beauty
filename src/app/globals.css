@@ -37,6 +37,19 @@
   --color-positive: #3f7d5a;
   --color-negative: #b84040;
 
+  /* Fundo da cena 3D do frasco (/lab/bottle).
+   *
+   * É o vidro que refrata esta cor, então a página e a cena precisam ter
+   * EXATAMENTE a mesma: se divergirem, o frasco deixa de parecer
+   * transparente. Antes havia duas cópias do literal — uma no `bg-[...]`
+   * da página e outra no default do `BottleViewer` — e nada as ligava.
+   *
+   * Não é cor de marca: o `/lab/bottle` é bancada de desenvolvimento. Fica
+   * fora do tema (um valor só, sem variante escura) porque WebGL não lê
+   * `var()` e não acompanharia a troca de tema de qualquer jeito. O espelho
+   * em TypeScript é `src/lib/design/domain/scene-palette.ts`. */
+  --color-scene-backdrop: #0f5a58;
+
   /* Semantic compatibility with shadcn and tailwind */
   --background: var(--color-surface-base);
   --foreground: var(--color-ink-strong);
@@ -492,6 +505,10 @@
 
   .bg-brand-pink {
     background-color: var(--color-brand-pink);
+  }
+
+  .bg-scene-backdrop {
+    background-color: var(--color-scene-backdrop);
   }
 
   .bg-ink-overlay-soft {

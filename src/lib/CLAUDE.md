@@ -109,12 +109,27 @@ múltiplas conexões e vaza pool.
 
 ## 7. Tokens de design
 
-- [`design/domain/tokens.ts`](design/domain/tokens.ts) é a **fonte única**
-  em TypeScript; os valores CSS vivem em `src/app/globals.css`. Cores
-  (**hex**, não OKLCH), tipografia, espaçamento. Nunca hardcodar paleta em
-  componente.
-- Se precisar de cor que não está nos tokens: **adicione ao tokens
-  primeiro**, depois use.
+- **A fonte da verdade para cor é [`src/app/globals.css`](../app/globals.css)**,
+  não TypeScript. Componente usa token (`bg-primary`, `text-ink-muted`,
+  `bg-scene-backdrop`); nunca hex solto.
+- Espelho em TS existe **só onde o renderizador não lê CSS**, e cada um tem
+  teste que falha se divergir do `globals.css`:
+
+  | Espelho                                                            | Por que existe                                       |
+  | ------------------------------------------------------------------ | ---------------------------------------------------- |
+  | [`seo/domain/og-palette.ts`](seo/domain/og-palette.ts)             | `satori` roda fora do navegador, não resolve `var()` |
+  | [`design/domain/scene-palette.ts`](design/domain/scene-palette.ts) | WebGL recebe string e desenha; `var()` vira preto    |
+
+- ⚠️ **[`design/domain/tokens.ts`](design/domain/tokens.ts) NÃO é a fonte
+  de cor**, ao contrário do que esta seção afirmava. O `colors` dele é a
+  paleta **antiga** (gold/ivory em **OKLCH**), que o `CLAUDE.md` da raiz
+  diz explicitamente que o projeto não usa. Dos 11 exports do arquivo,
+  **10 não têm nenhum consumidor**; o único vivo é `motion`, importado por
+  `motion/presentation/gsap-helpers.ts`. Ver §7.1 do
+  [`design/CLAUDE.md`](design/CLAUDE.md).
+- Cor nova vai no `globals.css` (token + utilitário à mão, se ficar fora do
+  `@theme inline`). Só ganha espelho em TS se um renderizador fora do
+  navegador precisar dela.
 
 ## 8. Não faça
 

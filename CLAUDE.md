@@ -58,14 +58,14 @@ Cada domínio é uma pasta em `src/lib/<dominio>/`. A profundidade de camadas
 
 ### Caminhos que mais se procura
 
-| O quê                      | Onde                                             |
-| -------------------------- | ------------------------------------------------ |
-| Singleton do Prisma        | `src/lib/shared/infrastructure/prisma-client.ts` |
-| Schemas Zod compartilhados | `src/lib/shared/domain/zod-schemas.ts`           |
-| Tokens de design           | `src/lib/design/domain/tokens.ts`                |
-| `cn()` (merge de classes)  | `src/shadcn-utils/utils.ts`                      |
-| Auth do admin (Edge-safe)  | `src/lib/auth/presentation/admin-auth.ts`        |
-| Confirmação de pagamento   | `src/lib/orders/application/confirm-payment.ts`  |
+| O quê                      | Onde                                                                |
+| -------------------------- | ------------------------------------------------------------------- |
+| Singleton do Prisma        | `src/lib/shared/infrastructure/prisma-client.ts`                    |
+| Schemas Zod compartilhados | `src/lib/shared/domain/zod-schemas.ts`                              |
+| Tokens de design (cor)     | `src/app/globals.css` (fonte) — ver `src/lib/design/CLAUDE.md` §7.1 |
+| `cn()` (merge de classes)  | `src/shadcn-utils/utils.ts`                                         |
+| Auth do admin (Edge-safe)  | `src/lib/auth/presentation/admin-auth.ts`                           |
+| Confirmação de pagamento   | `src/lib/orders/application/confirm-payment.ts`                     |
 
 ## 4. Scripts (sempre via pnpm)
 

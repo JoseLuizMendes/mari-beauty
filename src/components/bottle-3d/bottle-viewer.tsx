@@ -19,6 +19,7 @@ import { Canvas } from "@react-three/fiber";
 import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import { BottleMesh } from "./bottle-mesh";
 import type { BottleProfile } from "@/lib/design/domain/bottle-profile";
+import { scenePalette } from "@/lib/design/domain/scene-palette";
 
 /**
  * Ambas as capacidades abaixo vivem FORA do React — são do navegador. Lê-las
@@ -166,6 +167,11 @@ export interface BottleViewerProps {
   /**
    * Cor do fundo DA CENA. Precisa acompanhar o fundo da página, porque é
    * ele que o vidro refrata. Sem isto o frasco não parece transparente.
+   *
+   * O default é `scenePalette.backdrop`, que espelha
+   * `--color-scene-backdrop` — o mesmo token que a página usa via
+   * `bg-scene-backdrop`. Não passe literal aqui: as duas pontas têm que
+   * sair da mesma fonte, senão divergem sem ninguém notar.
    */
   backdropColor?: string;
   className?: string;
@@ -174,7 +180,7 @@ export interface BottleViewerProps {
 export function BottleViewer({
   profile,
   autoRotate = true,
-  backdropColor = "#0f5a58",
+  backdropColor = scenePalette.backdrop,
   className,
 }: BottleViewerProps) {
   const lowPower = useLowPowerMode();
