@@ -120,13 +120,20 @@ múltiplas conexões e vaza pool.
   | [`seo/domain/og-palette.ts`](seo/domain/og-palette.ts)             | `satori` roda fora do navegador, não resolve `var()` |
   | [`design/domain/scene-palette.ts`](design/domain/scene-palette.ts) | WebGL recebe string e desenha; `var()` vira preto    |
 
-- ⚠️ **[`design/domain/tokens.ts`](design/domain/tokens.ts) NÃO é a fonte
-  de cor**, ao contrário do que esta seção afirmava. O `colors` dele é a
-  paleta **antiga** (gold/ivory em **OKLCH**), que o `CLAUDE.md` da raiz
-  diz explicitamente que o projeto não usa. Dos 11 exports do arquivo,
-  **10 não têm nenhum consumidor**; o único vivo é `motion`, importado por
-  `motion/presentation/gsap-helpers.ts`. Ver §7.1 do
+- **[`design/domain/tokens.ts`](design/domain/tokens.ts) não tem cor
+  nenhuma.** Esta seção já afirmou que ele era a fonte única em TS; era
+  falso — o `colors` dele era a paleta pré-rebrand em OKLCH e 10 dos 11
+  exports não tinham consumidor. Os dez foram apagados; sobrou `motion`,
+  usado por `motion/presentation/gsap-helpers.ts`. Ver §7.1 do
   [`design/CLAUDE.md`](design/CLAUDE.md).
+- ⚠️ **Modificador de opacidade em cor de marca não funciona hoje.**
+  `bg-brand-wine/80`, `text-brand-pink/60` e afins **não geram CSS** — são
+  165 classes mortas no `src/`. As famílias `brand-*`, `ink-*` e
+  `surface-*` estão em `:root` puro, não no `@theme`, e o Tailwind v4 só
+  monta `/NN` para cor registrada. Use a forma simples
+  (`bg-brand-wine`, `text-ink-muted`) ou uma cor do shadcn
+  (`bg-muted/50`, `border-border/40` funcionam). Diagnóstico e a correção
+  proposta em §7.2 do [`design/CLAUDE.md`](design/CLAUDE.md).
 - Cor nova vai no `globals.css` (token + utilitário à mão, se ficar fora do
   `@theme inline`). Só ganha espelho em TS se um renderizador fora do
   navegador precisar dela.

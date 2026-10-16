@@ -29,8 +29,13 @@ Beauty**. Nome do package: `mari-beauty`.
   apropriado.
 - **TypeScript** com paths `@/*` → `src/*` (ver `tsconfig.json`).
 - **Tailwind v4** (PostCSS). **Não há `tailwind.config.ts`** — v4 lê do CSS.
-  Tokens em [`src/app/globals.css`](src/app/globals.css); helpers tipados em
-  [`src/lib/design/domain/tokens.ts`](src/lib/design/domain/tokens.ts).
+  Tokens em [`src/app/globals.css`](src/app/globals.css) — é a fonte, não
+  há espelho em TS da paleta.
+  [`src/lib/design/domain/tokens.ts`](src/lib/design/domain/tokens.ts) tem
+  **só motion do GSAP**; já disse que era a fonte de cor e não era (ver
+  [`src/lib/design/CLAUDE.md`](src/lib/design/CLAUDE.md) §7.1).
+  ⚠️ **`bg-brand-wine/80` e afins não geram CSS** — 165 classes mortas,
+  diagnóstico em §7.2 do mesmo arquivo.
   Os tokens de marca são **hex** (`--color-brand-wine: #47131C`), com uma
   camada de compatibilidade semântica para o shadcn. Não são OKLCH.
   **Espaçamento tem escala de 8pt com nomes semânticos** (`p-card`,
