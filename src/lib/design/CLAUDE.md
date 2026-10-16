@@ -124,6 +124,63 @@ tocado por outro motivo.
 
 ---
 
+## 9. Contraste (WCAG 2.1 AA)
+
+`src/test/contrast-aa.test.ts` lê o `globals.css`, resolve a cadeia de
+`var()` até o hex e checa os pares **que o próprio CSS declara como par**,
+nos dois temas. Checar par declarado, e não todas as combinações, é
+deliberado: combinar 167 tokens dois a dois daria 13.861 pares, quase todos
+irreais, e relatório que ninguém lê não protege nada.
+
+A aritmética fica em [`domain/contrast.ts`](domain/contrast.ts) — pura,
+testável, sem dependência de CSS.
+
+### O que passa
+
+Todos os sete pares de texto, nos dois temas, e o anel de foco.
+
+|                                                  | Razão      |                   |
+| ------------------------------------------------ | ---------- | ----------------- |
+| `--foreground` sobre `--background` (claro)      | 17,46:1    | ✓                 |
+| `--primary-foreground` sobre `--primary` (claro) | 14,86:1    | ✓                 |
+| `--ring` sobre `--background` (claro)            | 14,86:1    | ✓                 |
+| **`--muted-foreground` sobre `--muted` (claro)** | **4,52:1** | ⚠️ passa por 0,02 |
+
+> **O `--muted-foreground` está no fio da navalha.** O mínimo é 4,5:1 e ele
+> dá 4,52:1. Qualquer escurecimento do fundo ou clareamento da tinta
+> reprova. O teste pega — é literalmente por isso que ele existe.
+
+### O que reprova, e por que não foi corrigido aqui
+
+**WCAG 1.4.11 (componentes não-textuais, mínimo 3:1):**
+
+| Token      | Tema claro | Tema escuro |
+| ---------- | ---------- | ----------- |
+| `--input`  | **1,58:1** | **2,15:1**  |
+| `--border` | 1,21:1     | 1,55:1      |
+
+O `--input` é violação real: o `Input` é `bg-transparent` no tema claro, então
+**a borda é a única coisa que marca onde o campo está**. Não é só número —
+é "onde eu clico pra digitar".
+
+O `--border` em card é discutível: o card tem `bg-card` e `--shadow-card`,
+e borda de agrupamento que não identifica controle nem estado é
+tratada como decorativa pela norma. Fica registrado, não afirmado.
+
+**Nenhum dos dois foi corrigido aqui, de propósito.** A correção exige
+escolher uma cor nova, e a identidade visual final — que redefine a paleta
+inteira — ainda não chegou. Escolher agora é escolher duas vezes, e inventar
+valor de marca não é decisão de quem escreve o teste.
+
+### Quando a identidade final entrar
+
+Rodar este teste é a **primeira** coisa a fazer. Ele é a diferença entre
+descobrir o problema com a paleta na mão e descobrir depois de a marca estar
+aplicada em dezenas de componentes. E aí o `--input` entra junto na mesma
+decisão.
+
+---
+
 ## Referências
 
 - `[[Preferencias Dev#3. Arquitetura Hexagonal]]`
