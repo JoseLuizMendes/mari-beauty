@@ -33,6 +33,9 @@ Beauty**. Nome do package: `mari-beauty`.
   [`src/lib/design/domain/tokens.ts`](src/lib/design/domain/tokens.ts).
   Os tokens de marca são **hex** (`--color-brand-wine: #47131C`), com uma
   camada de compatibilidade semântica para o shadcn. Não são OKLCH.
+  **Espaçamento tem escala de 8pt com nomes semânticos** (`p-card`,
+  `gap-block`, `py-section`) — nunca numéricos, que colidiriam com a escala
+  do Tailwind. Ver [`src/lib/design/CLAUDE.md`](src/lib/design/CLAUDE.md) §8.
 - **Prisma 7** com `@prisma/adapter-pg` (driver `pg`). Cliente gerado em
   `src/generated/` (não tocar). Schema em `prisma/schema.prisma`.
 - **shadcn/ui** — style `new-york`, icon library `lucide`. Os aliases do

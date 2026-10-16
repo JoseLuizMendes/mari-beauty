@@ -77,6 +77,53 @@ Nenhuma — domain puro.
 
 ---
 
+## 8. Escala de espaçamento (8pt)
+
+Os seis passos vivem no `@theme` do
+[`globals.css`](../../app/globals.css) e geram utilitários nomeados:
+
+| Token               | Valor | Utilitário             | Uso                                  |
+| ------------------- | ----- | ---------------------- | ------------------------------------ |
+| `--spacing-tight`   | 8px   | `p-tight`, `gap-tight` | ícone↔rótulo, inline apertado        |
+| `--spacing-control` | 16px  | `px-control`           | padding de controle, item de lista   |
+| `--spacing-card`    | 24px  | `p-card`               | padding de card, blocos relacionados |
+| `--spacing-block`   | 32px  | `gap-block`            | entre componentes de uma seção       |
+| `--spacing-section` | 48px  | `py-section`           | padding interno de seção             |
+| `--spacing-rhythm`  | 64px  | `mt-rhythm`            | ritmo vertical entre seções          |
+
+### Por que os nomes são semânticos e não numéricos
+
+No Tailwind v4 a escala numérica (`p-4`, `gap-2`) deriva de um multiplicador
+único, `--spacing` (0.25rem), enquanto o namespace `--spacing-*` gera
+utilitários **nomeados**. Um token chamado `--spacing-1` sequestraria o `p-1`:
+há **1.038 utilitários numéricos** em `src/`, e todos mudariam de valor sem
+ninguém notar. Nome semântico elimina a colisão — e ainda cumpre a §9 do
+`[[Design System Blueprint]]`, que manda nomear pelo significado.
+
+> Verificado no CSS do build: `.p-card{padding:1.5rem}` ao lado de
+> `.p-4{padding:calc(var(--spacing)*4)}`, com `--spacing:.25rem` intacto.
+
+### Regra
+
+**Espaçamento novo usa os passos nomeados.** Se o valor que você quer não
+está na tabela, o problema é o valor, não a tabela — a grade de 8pt é o
+contrato. `src/test/spacing-scale.test.ts` recusa passo fora da grade e
+recusa nome numérico.
+
+### O que ainda não foi migrado
+
+**469 dos 1.170 usos de espaçamento (40%) estão fora da grade de 8pt** —
+`p-1`, `p-3`, `p-5` e afins. Eles **não** foram migrados: sem teste de
+regressão visual, trocar 469 valores de uma vez é mudar o layout do site
+inteiro às cegas. A migração acontece por componente, conforme cada um for
+tocado por outro motivo.
+
+> `tokens.ts` exporta um `spacing` que são **strings de classe** com presets
+> responsivos de seção, não valores — e hoje sem nenhum consumidor. Não é a
+> escala; não confundir.
+
+---
+
 ## Referências
 
 - `[[Preferencias Dev#3. Arquitetura Hexagonal]]`
