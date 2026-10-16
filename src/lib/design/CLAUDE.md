@@ -260,30 +260,47 @@ Todos os sete pares de texto, nos dois temas, e o anel de foco.
 
 **WCAG 1.4.11 (componentes não-textuais, mínimo 3:1):**
 
-| Token      | Tema claro | Tema escuro |
-| ---------- | ---------- | ----------- |
-| `--input`  | **1,58:1** | **2,15:1**  |
-| `--border` | 1,21:1     | 1,55:1      |
+| Token      | Antes (claro / escuro) | Hoje                     |
+| ---------- | ---------------------- | ------------------------ |
+| `--input`  | 1,58:1 / 2,15:1 ❌     | **4,81:1 / 8,90:1** ✅   |
+| `--border` | 1,21:1 / 1,55:1        | igual — fora de asserção |
 
-O `--input` é violação real: o `Input` é `bg-transparent` no tema claro, então
-**a borda é a única coisa que marca onde o campo está**. Não é só número —
-é "onde eu clico pra digitar".
+#### `--input`: corrigido em 2026-10-16, e **asserido**
 
-O `--border` em card é discutível: o card tem `bg-card` e `--shadow-card`,
-e borda de agrupamento que não identifica controle nem estado é
-tratada como decorativa pela norma. Fica registrado, não afirmado.
+O `Input` é `bg-transparent` no tema claro, então **a borda é a única coisa
+que marca onde o campo está**. Não era só número — era "onde eu clico pra
+digitar", e a 1,58:1 ela praticamente sumia.
 
-**Nenhum dos dois foi corrigido aqui, de propósito.** A correção exige
-escolher uma cor nova, e a identidade visual final — que redefine a paleta
-inteira — ainda não chegou. Escolher agora é escolher duas vezes, e inventar
-valor de marca não é decisão de quem escreve o teste.
+Esta seção dizia que a correção "exige escolher uma cor nova" e que por isso
+tinha de esperar a identidade final. **Estava errada.** Medindo os tokens que
+já existiam contra o fundo:
+
+| Token                               | Sobre o fundo claro |
+| ----------------------------------- | ------------------- |
+| `--color-border-strong` (era o uso) | 1,58:1 ❌           |
+| `--color-border-subtle`             | 1,21:1 ❌           |
+| **`--color-ink-muted`**             | **4,81:1** ✅       |
+| `--color-ink-soft`                  | 11,29:1 ✅          |
+
+`--input` passou a apontar para `--color-ink-muted` — cor da própria paleta,
+quente, sem inventar valor de marca. O par entrou em `COMPONENTES` no teste:
+**regredir agora quebra o CI** (verificado revertendo o token — as duas
+asserções falham com 1,58:1 e 2,15:1).
+
+A lição vale além deste token: _"espera a identidade final"_ é fácil de
+escrever e difícil de desmentir. Bastava medir os candidatos que já existiam.
+
+#### `--border`: continua fora, de propósito
+
+O card tem `bg-card` e `--shadow-card`, e borda de agrupamento que não
+identifica controle nem estado é tratada como decorativa pela norma. Fica
+registrado, não afirmado.
 
 ### Quando a identidade final entrar
 
-Rodar este teste é a **primeira** coisa a fazer. Ele é a diferença entre
-descobrir o problema com a paleta na mão e descobrir depois de a marca estar
-aplicada em dezenas de componentes. E aí o `--input` entra junto na mesma
-decisão.
+Rodar este teste é a **primeira** coisa a fazer. Com o `--input` agora
+asserido, uma paleta nova que erre o contraste do campo **quebra o CI** em
+vez de passar despercebida — que é exatamente o serviço que se espera dele.
 
 ---
 

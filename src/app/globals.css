@@ -67,7 +67,13 @@
   --muted-foreground: var(--color-ink-muted);
   --destructive: #b84040;
   --border: var(--color-border-subtle);
-  --input: var(--color-border-strong);
+  /* O campo é `bg-transparent` no tema claro: a borda é a ÚNICA coisa que
+   * marca onde se clica para digitar. Com `--color-border-strong` dava
+   * 1,58:1 contra o fundo — reprovava o mínimo de 3:1 da WCAG 1.4.11 e,
+   * na prática, sumia. `--color-ink-muted` dá 4,81:1 no claro e 8,90:1 no
+   * escuro, e já é da paleta: não inventa cor.
+   * Guardado por `src/test/contrast-aa.test.ts`. */
+  --input: var(--color-ink-muted);
   --ring: var(--color-brand-wine);
 
   --chart-1: var(--color-brand-wine);
@@ -194,7 +200,13 @@
   --muted: #3a1018;
   --muted-foreground: var(--color-ink-muted);
   --border: var(--color-border-subtle);
-  --input: var(--color-border-strong);
+  /* O campo é `bg-transparent` no tema claro: a borda é a ÚNICA coisa que
+   * marca onde se clica para digitar. Com `--color-border-strong` dava
+   * 1,58:1 contra o fundo — reprovava o mínimo de 3:1 da WCAG 1.4.11 e,
+   * na prática, sumia. `--color-ink-muted` dá 4,81:1 no claro e 8,90:1 no
+   * escuro, e já é da paleta: não inventa cor.
+   * Guardado por `src/test/contrast-aa.test.ts`. */
+  --input: var(--color-ink-muted);
   --ring: var(--color-brand-pink);
 }
 
