@@ -365,32 +365,59 @@ Links em `label`.
 
 ### Signature Component: o frasco
 
-A primeira tela da home é o frasco em WebGL sobre o papel creme, girando com o scroll.
-Não é enfeite: é a foto de produto, renderizada ao vivo.
+A primeira tela da home é o frasco girando em 3D conforme o scroll, sobre o papel creme.
+É a foto de produto, não enfeite. Técnica: a mesma do More Nutrition (SOTD Awwwards),
+verificada no código deles: **sequência de frames desenhada num `<canvas>` 2D**, com o
+índice do frame amarrado ao scroll por GSAP ScrollTrigger (`scrub`). Não é WebGL em
+runtime.
 
-**O líquido é vinho.** Vidro transparente sobre creme chapado desaparece, pelo mesmo
-motivo da razão de 1,27 entre creme e rosé. O que torna o frasco legível é o líquido:
-`#47131C` a 81% de altura, lido como uma silhueta de tinta sobre o papel. Tampa em vinho,
-vidro quase incolor com tinta quente mínima. Assim o frasco é a maior peça de tinta da
-página sem que nenhuma parede fique vinho.
+**Os frames são renderizados offline com o three.js que já está no repo.** O modelo
+paramétrico de `bottle-profile.ts` + `bottle-mesh.tsx` ganha um preset `spray` (corpo
+cilíndrico, ombro arredondado, válvula e sobretampa), usando como referência de forma o
+frasco rosa de `public/assets/inspiration/spray-bottles.png`. Um script roda a cena
+headless e exporta a volta completa. Por que assim e não de outro jeito:
 
-O perfil atual em `bottle-profile.ts` veio de `hero1.png` e é da paleta anterior ao
-rebrand: líquido dourado `#dbb052`, tampa `#0a0a0c`. Precisa de um perfil novo.
+| Caminho                      | Problema                                                                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| three.js ao vivo             | 265,7 KB gzip de chunk, risco em celular fraco, precisa fallback                                                            |
+| 200 frames gerados por IA    | a IA não mantém o mesmo objeto em 200 imagens; o rótulo alucina (a foto de referência já tem "An⅀e IALE" no lugar do texto) |
+| foto chapada com escala      | não gira; uma foto só tem um lado                                                                                           |
+| **render offline do modelo** | **determinístico, rótulo é textura nossa, zero JS 3D no cliente**                                                           |
 
-Regras de implementação, todas obrigatórias:
+Bônus: com o hero fora do WebGL, o three.js some do bundle de produção (só a bancada
+`/lab/bottle` continua usando).
 
-- **`next/dynamic`, sempre.** O chunk do three.js é 265,7 KB gzip contra um teto de 300 e
-  um baseline de 270. Entrando no baseline, quebra o build. Fora dele, sobram 34 KB.
-- **`backdropColor` recebe o papel.** O vidro refrata o fundo da página, então a cor da
-  cena e a cor atrás do canvas têm que ser idênticas, ou o frasco deixa de parecer
-  transparente. `scene-palette.ts` ganha a entrada `paper`, e
-  `src/test/scene-palette.test.ts` passa a guardar as duas. O teal `#0f5a58` continua
-  existindo só como default da bancada `/lab/bottle`.
-- **Fallback é imagem, não tela vazia.** Sem WebGL, em `lowPower`, ou sob
-  `prefers-reduced-motion`, entra um poster AVIF do mesmo enquadramento. O
-  `lowPower` do `bottle-mesh` já desliga `transmission`; o poster cobre o resto.
-- **O scroll gira, não desloca.** Rotação no eixo Y amarrada ao progresso do scroll via
-  ScrollTrigger com `scrub`. Sem movimento de câmera, sem paralaxe, sem zoom.
+**Cor do objeto.** Corpo em rosé fosco puxado da paleta (não o `#876459` amarronzado da
+foto), válvula e sobretampa creme, rótulo em tinta vinho com o texto real da marca. Fundo
+transparente (alpha), para o frasco pousar direto no papel.
+
+**Orçamento, obrigatório:**
+
+- 120 frames, WebP com alpha. Dois jogos: 1080 px (desktop) e 720 px (celular), escolhido
+  por `matchMedia` antes de baixar. Alvo: ~2 MB no celular, ~4 MB no desktop. O More
+  Nutrition usa 200 frames de 1920 px e ~10 MB; não precisamos disso.
+- Carregamento progressivo: primeiro 1 a cada 8 frames (a volta já funciona, em
+  degraus), depois o resto preenche. O frame 0 é um `<img>` comum com `priority`, para o
+  LCP não esperar o canvas.
+- Os frames saem de `public/`, contam em `performance-budget.json` e ganham teto próprio.
+- `prefers-reduced-motion`: só o frame 0, parado.
+
+### Parallax e scroll
+
+O parallax fica, é pedido explícito do dono, e o Lenis é a base: scroll suave em todo o
+site, montado uma vez no `LenisProvider`, com o ScrollTrigger sincronizado nele.
+
+- **Hero:** três planos em velocidades diferentes. Frasco (gira e sobe devagar), texto
+  (sobe mais rápido e sai antes), fio e rótulo de preço (fixos até o fim do pin). O hero
+  fica _pinned_ durante a volta do frasco, ~150vh no celular, ~200vh no desktop.
+- **Grade de produto:** cada foto desloca de 6 a 10% (`yPercent`) dentro do próprio
+  recorte enquanto o card atravessa a tela. Recorte com `overflow: hidden`, então a moldura
+  não mexe, só a imagem dentro dela.
+- **Tarja:** o texto entra com leve atraso em relação à faixa.
+- Tudo em `transform` com `scrub`; nada de animar `top`, `margin` ou altura.
+- O parallax funciona igual no celular, porque é scroll, não hover.
+- `prefers-reduced-motion: reduce` desliga pin, parallax e sequência; Lenis cai para scroll
+  nativo.
 
 ### Signature Component: a tarja
 
@@ -401,11 +428,12 @@ A faixa rosé sangrada de borda a borda é o componente que dá identidade ao si
 - Conteúdo dentro dela em tinta e `ink-soft`. Nunca `ink-muted`.
 - Uma por página, duas no máximo em página longa.
 - Entra com um varrido vertical de 900ms na curva de assinatura quando cruza o viewport,
-  nunca com fade simples. É o único movimento do site com permissão de ser notado.
+  nunca com fade simples.
 
 ### Motion
 
-Uma curva, duas durações.
+Uma curva de easing para estado e entrada, duas durações. O movimento ligado ao scroll
+(pin, sequência, parallax) não usa duração: segue o dedo, via `scrub`.
 
 ```css
 --ease-signature: cubic-bezier(0.16, 1, 0.3, 1);
